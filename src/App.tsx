@@ -2008,9 +2008,8 @@ const Dashboard = () => {
     const currentUid = profile?.uid ?? user.uid;
 
     if (canAccessAdminUi) {
-      const projectsQuery = query(collection(db, 'projects'), where('adminUid', '==', currentUid));
       unsubscribers.push(
-        onSnapshot(projectsQuery, (snapshot) => {
+        onSnapshot(collection(db, 'projects'), (snapshot) => {
           setProjects(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Project)));
         }),
       );
