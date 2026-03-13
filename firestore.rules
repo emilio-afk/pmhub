@@ -117,9 +117,22 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
 
+    function hasUserDocument() {
+      return isAuthenticated() &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function hasManagedAdminEmail() {
+      return isAuthenticated() &&
+             request.auth.token.email is string &&
+             exists(/databases/$(database)/documents/appConfig/access) &&
+             request.auth.token.email in get(/databases/$(database)/documents/appConfig/access).data.adminEmails;
+    }
+
     function isAdmin() {
       return isAuthenticated() && (
-        getUserData().role == 'admin' || 
+        (hasUserDocument() && getUserData().role == 'admin') ||
+        hasManagedAdminEmail() ||
         (request.auth.token.email == "emilio@astrolab.mx" && request.auth.token.email_verified == true)
       );
     }
@@ -327,8 +340,13 @@ service cloud.firestore {
                     (
                       isAdmin() ||
                       (
-                        request.resource.data.role == 'client' &&
                         request.resource.data.email == request.auth.token.email &&
+                        request.resource.data.role == 'admin' &&
+                        hasManagedAdminEmail()
+                      ) ||
+                      (
+                        request.resource.data.email == request.auth.token.email &&
+                        request.resource.data.role == 'client' &&
                         hasCurrentEmailInvitation()
                       )
                     );
