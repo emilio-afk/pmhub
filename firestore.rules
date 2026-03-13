@@ -1,0 +1,418 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {uid}
+    // Fields:
+    //   - uid: string (required)
+    //   - email: string (required)
+    //   - displayName: string
+    //   - role: string (admin, client) (required)
+    //   - createdAt: string (date-time)
+    //
+    // Collection: projects
+    // Document ID: {projectId}
+    // Fields:
+    //   - name: string (required)
+    //   - description: string
+    //   - status: string (active, on-hold, completed) (required)
+    //   - adminUid: string (required)
+    //   - clientUid: string (legacy fallback)
+    //   - memberUids: string[] (client members with read-only access)
+    //   - createdAt: string (date-time)
+    //   - updatedAt: string (date-time)
+    //
+    // Collection: projects/{projectId}/members
+    // Document ID: {uid}
+    // Fields:
+    //   - uid: string (required)
+    //   - role: string (viewer) (required)
+    //   - addedAt: string (date-time)
+    //
+    // Collection: clientInvitations
+    // Document ID: {normalizedEmail}
+    // Fields:
+    //   - email: string (required)
+    //   - displayName: string
+    //   - invitedAt: string (date-time)
+    //   - invitedBy: string
+    //
+    // Collection: projects/{projectId}/tasks
+    // Document ID: {taskId}
+    // Fields:
+    //   - projectId: string (required)
+    //   - title: string (required)
+    //   - description: string
+    //   - status: string (todo, in-progress, approval, done) (required)
+    //   - requiresApproval: bool
+    //   - approvalRequestedAt, approvedAt, approvedByUid, approvedByName: optional string
+    //   - order: number (required)
+    //   - createdAt: string (date-time)
+    //
+    // Collection: projects/{projectId}/tasks/{taskId}/checklists
+    // Document ID: {checklistId}
+    // Fields:
+    //   - taskId: string (required)
+    //   - text: string (required)
+    //   - completed: bool (required)
+    //   - createdAt: string (date-time)
+    //
+    // Collection: projects/{projectId}/updates
+    // Fields:
+    //   - title, summary, achievements, blockers, nextSteps: string
+    //   - progress: number
+    //   - createdAt: string
+    //   - authorUid, authorName: string
+    //
+    // Collection: projects/{projectId}/milestones
+    // Fields:
+    //   - title, description, dueDate, owner, createdAt: string
+    //   - status: string (planned, at-risk, completed)
+    //   - progress: number
+    //
+    // Collection: projects/{projectId}/approvals
+    // Fields:
+    //   - title, description, itemType: string
+    //   - status: string (pending, approved, changes-requested)
+    //   - requestedAt, requestedByUid, requestedByName: string
+    //   - decidedAt, decidedByUid, decidedByName, decisionNote: optional string
+    //
+    // Collection: projects/{projectId}/risks
+    // Fields:
+    //   - title, description, owner, mitigation, createdAt: string
+    //   - impact: string (low, medium, high)
+    //   - status: string (open, mitigated, closed)
+    //
+    // Collection: projects/{projectId}/deliverables
+    // Fields:
+    //   - title, category, url, version, notes, uploadedAt: string
+    //   - status: string (draft, shared, approved)
+    //
+    // Collection: projects/{projectId}/clientActions
+    // Fields:
+    //   - title, description, dueDate, createdAt: string
+    //   - status: string (pending, submitted, done)
+    //
+    // Collection: projects/{projectId}/comments
+    // Fields:
+    //   - contextType: string (task, milestone, deliverable, approval)
+    //   - contextId, message, authorUid, authorName, createdAt: string
+    //
+    // Collection: projects/{projectId}/activity
+    // Fields:
+    //   - type, message, actorUid, actorName, createdAt: string
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        getUserData().role == 'admin' || 
+        (request.auth.token.email == "emilio@astrolab.mx" && request.auth.token.email_verified == true)
+      );
+    }
+
+    function hasCurrentEmailInvitation() {
+      return isAuthenticated() &&
+             request.auth.token.email is string &&
+             exists(/databases/$(database)/documents/clientInvitations/$(request.auth.token.email));
+    }
+
+    function isProjectClient(projectId) {
+      return isAuthenticated() && get(/databases/$(database)/documents/projects/$(projectId)).data.clientUid == request.auth.uid;
+    }
+
+    function isProjectMember(projectId) {
+      return isAuthenticated() && (
+        exists(/databases/$(database)/documents/projects/$(projectId)/members/$(request.auth.uid)) ||
+        isProjectClient(projectId)
+      );
+    }
+
+    function isProjectAdmin(projectId) {
+      return isAuthenticated() && get(/databases/$(database)/documents/projects/$(projectId)).data.adminUid == request.auth.uid;
+    }
+
+    function canManageProject(projectId) {
+      return isAdmin() || isProjectAdmin(projectId);
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email', 'role']) &&
+             data.uid is string &&
+             data.email is string &&
+             data.role in ['admin', 'client'];
+    }
+
+    function isValidProject(data) {
+      return data.keys().hasAll(['name', 'status', 'adminUid']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.status in ['active', 'on-hold', 'completed'] &&
+             data.adminUid is string &&
+             (!data.keys().hasAny(['clientUid']) || data.clientUid is string) &&
+             (!data.keys().hasAny(['memberUids']) || data.memberUids is list) &&
+             (!data.keys().hasAny(['health']) || data.health in ['green', 'yellow', 'red']) &&
+             (!data.keys().hasAny(['budgetHours']) || data.budgetHours is number) &&
+             (!data.keys().hasAny(['usedHours']) || data.usedHours is number) &&
+             (!data.keys().hasAny(['budgetAmount']) || data.budgetAmount is number) &&
+             (!data.keys().hasAny(['spentAmount']) || data.spentAmount is number) &&
+             (!data.keys().hasAny(['scopeSummary']) || data.scopeSummary is string);
+    }
+
+    function isValidTask(data) {
+      return data.keys().hasAll(['projectId', 'title', 'status', 'order']) &&
+             data.projectId is string &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 200 &&
+             data.status in ['todo', 'in-progress', 'approval', 'done'] &&
+             data.order is number &&
+             (!data.keys().hasAny(['requiresApproval']) || data.requiresApproval is bool) &&
+             (!data.keys().hasAny(['approvalRequestedAt']) || data.approvalRequestedAt is string) &&
+             (!data.keys().hasAny(['approvedAt']) || data.approvedAt is string) &&
+             (!data.keys().hasAny(['approvedByUid']) || data.approvedByUid is string) &&
+             (!data.keys().hasAny(['approvedByName']) || data.approvedByName is string);
+    }
+
+    function isTaskApprovalDecision(projectId) {
+      return isProjectMember(projectId) &&
+             resource.data.status == 'approval' &&
+             resource.data.requiresApproval == true &&
+             request.resource.data.status == 'done' &&
+             request.resource.data.approvedByUid == request.auth.uid &&
+             request.resource.data.approvedByName is string &&
+             request.resource.data.approvedAt is string &&
+             request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'approvedAt', 'approvedByUid', 'approvedByName']);
+    }
+
+    function isValidChecklist(data) {
+      return data.keys().hasAll(['taskId', 'text', 'completed']) &&
+             data.taskId is string &&
+             data.text is string && data.text.size() > 0 && data.text.size() < 500 &&
+             data.completed is bool;
+    }
+
+    function isValidProjectMember(uid, data) {
+      return data.keys().hasAll(['uid', 'role', 'addedAt']) &&
+             data.uid == uid &&
+             data.uid is string &&
+             data.role == 'viewer' &&
+             data.addedAt is string;
+    }
+
+    function isValidClientInvitation(emailKey, data) {
+      return data.keys().hasAll(['email', 'displayName', 'invitedAt', 'invitedBy']) &&
+             data.email == emailKey &&
+             data.email is string &&
+             data.displayName is string &&
+             data.invitedAt is string &&
+             data.invitedBy is string;
+    }
+
+    function isValidProjectUpdate(data) {
+      return data.keys().hasAll(['title', 'summary', 'achievements', 'blockers', 'nextSteps', 'progress', 'createdAt', 'authorUid', 'authorName']) &&
+             data.title is string &&
+             data.summary is string &&
+             data.achievements is string &&
+             data.blockers is string &&
+             data.nextSteps is string &&
+             data.progress is number &&
+             data.createdAt is string &&
+             data.authorUid is string &&
+             data.authorName is string;
+    }
+
+    function isValidMilestone(data) {
+      return data.keys().hasAll(['title', 'description', 'dueDate', 'status', 'progress', 'owner', 'createdAt']) &&
+             data.title is string &&
+             data.description is string &&
+             data.dueDate is string &&
+             data.status in ['planned', 'at-risk', 'completed'] &&
+             data.progress is number &&
+             data.owner is string &&
+             data.createdAt is string;
+    }
+
+    function isValidApproval(data) {
+      return data.keys().hasAll(['title', 'description', 'itemType', 'status', 'requestedAt', 'requestedByUid', 'requestedByName']) &&
+             data.title is string &&
+             data.description is string &&
+             data.itemType in ['deliverable', 'change-request', 'phase', 'copy', 'design'] &&
+             data.status in ['pending', 'approved', 'changes-requested'] &&
+             data.requestedAt is string &&
+             data.requestedByUid is string &&
+             data.requestedByName is string &&
+             (!data.keys().hasAny(['decidedAt']) || data.decidedAt is string) &&
+             (!data.keys().hasAny(['decidedByUid']) || data.decidedByUid is string) &&
+             (!data.keys().hasAny(['decidedByName']) || data.decidedByName is string) &&
+             (!data.keys().hasAny(['decisionNote']) || data.decisionNote is string);
+    }
+
+    function isValidRisk(data) {
+      return data.keys().hasAll(['title', 'description', 'impact', 'status', 'owner', 'mitigation', 'createdAt']) &&
+             data.title is string &&
+             data.description is string &&
+             data.impact in ['low', 'medium', 'high'] &&
+             data.status in ['open', 'mitigated', 'closed'] &&
+             data.owner is string &&
+             data.mitigation is string &&
+             data.createdAt is string;
+    }
+
+    function isValidDeliverable(data) {
+      return data.keys().hasAll(['title', 'category', 'url', 'version', 'status', 'notes', 'uploadedAt']) &&
+             data.title is string &&
+             data.category is string &&
+             data.url is string &&
+             data.version is string &&
+             data.status in ['draft', 'shared', 'approved'] &&
+             data.notes is string &&
+             data.uploadedAt is string;
+    }
+
+    function isValidClientAction(data) {
+      return data.keys().hasAll(['title', 'description', 'dueDate', 'status', 'createdAt']) &&
+             data.title is string &&
+             data.description is string &&
+             data.dueDate is string &&
+             data.status in ['pending', 'submitted', 'done'] &&
+             data.createdAt is string;
+    }
+
+    function isValidComment(data) {
+      return data.keys().hasAll(['contextType', 'contextId', 'message', 'authorUid', 'authorName', 'createdAt']) &&
+             data.contextType in ['task', 'milestone', 'deliverable', 'approval'] &&
+             data.contextId is string &&
+             data.message is string &&
+             data.authorUid is string &&
+             data.authorName is string &&
+             data.createdAt is string;
+    }
+
+    function isValidActivity(data) {
+      return data.keys().hasAll(['type', 'message', 'actorUid', 'actorName', 'createdAt']) &&
+             data.type is string &&
+             data.message is string &&
+             data.actorUid is string &&
+             data.actorName is string &&
+             data.createdAt is string;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{uid} {
+      allow read: if isAuthenticated() && (request.auth.uid == uid || isAdmin());
+      allow create: if isAuthenticated() &&
+                    request.auth.uid == uid &&
+                    isValidUser(request.resource.data) &&
+                    (
+                      isAdmin() ||
+                      (
+                        request.resource.data.role == 'client' &&
+                        request.resource.data.email == request.auth.token.email &&
+                        hasCurrentEmailInvitation()
+                      )
+                    );
+      allow update: if isAuthenticated() && request.auth.uid == uid && isValidUser(request.resource.data) && request.resource.data.role == resource.data.role;
+      allow delete: if isAdmin();
+    }
+
+    match /projects/{projectId} {
+      allow read: if canManageProject(projectId) || isProjectMember(projectId);
+      allow create: if isAdmin() && isValidProject(request.resource.data);
+      allow update: if canManageProject(projectId) && isValidProject(request.resource.data);
+      allow delete: if canManageProject(projectId);
+
+      match /members/{uid} {
+        allow read: if canManageProject(projectId) || request.auth.uid == uid;
+        allow create, update: if canManageProject(projectId) && isValidProjectMember(uid, request.resource.data);
+        allow delete: if canManageProject(projectId);
+      }
+
+      match /tasks/{taskId} {
+        allow read: if canManageProject(projectId) || isProjectMember(projectId);
+        allow create: if canManageProject(projectId) && isValidTask(request.resource.data);
+        allow update: if (canManageProject(projectId) && isValidTask(request.resource.data)) ||
+                         (isTaskApprovalDecision(projectId) && isValidTask(request.resource.data));
+        allow delete: if canManageProject(projectId);
+
+        match /checklists/{checklistId} {
+          allow read: if canManageProject(projectId) || isProjectMember(projectId);
+          allow create: if canManageProject(projectId) && isValidChecklist(request.resource.data);
+          allow update: if canManageProject(projectId) && isValidChecklist(request.resource.data);
+          allow delete: if canManageProject(projectId);
+        }
+      }
+
+      match /updates/{updateId} {
+        allow read: if canManageProject(projectId) || isProjectMember(projectId);
+        allow create, update: if canManageProject(projectId) && isValidProjectUpdate(request.resource.data);
+        allow delete: if canManageProject(projectId);
+      }
+
+      match /milestones/{milestoneId} {
+        allow read: if canManageProject(projectId) || isProjectMember(projectId);
+        allow create, update: if canManageProject(projectId) && isValidMilestone(request.resource.data);
+        allow delete: if canManageProject(projectId);
+      }
+
+      match /approvals/{approvalId} {
+        allow read: if canManageProject(projectId) || isProjectMember(projectId);
+        allow create: if canManageProject(projectId) && isValidApproval(request.resource.data);
+        allow update: if (canManageProject(projectId) || isProjectMember(projectId)) && isValidApproval(request.resource.data);
+        allow delete: if canManageProject(projectId);
+      }
+
+      match /risks/{riskId} {
+        allow read: if canManageProject(projectId) || isProjectMember(projectId);
+        allow create, update: if canManageProject(projectId) && isValidRisk(request.resource.data);
+        allow delete: if canManageProject(projectId);
+      }
+
+      match /deliverables/{deliverableId} {
+        allow read: if canManageProject(projectId) || isProjectMember(projectId);
+        allow create, update: if canManageProject(projectId) && isValidDeliverable(request.resource.data);
+        allow delete: if canManageProject(projectId);
+      }
+
+      match /clientActions/{clientActionId} {
+        allow read: if canManageProject(projectId) || isProjectMember(projectId);
+        allow create: if canManageProject(projectId) && isValidClientAction(request.resource.data);
+        allow update: if (canManageProject(projectId) || isProjectMember(projectId)) && isValidClientAction(request.resource.data);
+        allow delete: if canManageProject(projectId);
+      }
+
+      match /comments/{commentId} {
+        allow read: if canManageProject(projectId) || isProjectMember(projectId);
+        allow create: if (canManageProject(projectId) || isProjectMember(projectId)) && isValidComment(request.resource.data);
+        allow update: if (canManageProject(projectId) || request.auth.uid == resource.data.authorUid) && isValidComment(request.resource.data);
+        allow delete: if canManageProject(projectId) || request.auth.uid == resource.data.authorUid;
+      }
+
+      match /activity/{activityId} {
+        allow read: if canManageProject(projectId) || isProjectMember(projectId);
+        allow create: if (canManageProject(projectId) || isProjectMember(projectId)) && isValidActivity(request.resource.data);
+        allow update, delete: if canManageProject(projectId);
+      }
+    }
+
+    match /clientInvitations/{emailKey} {
+      allow get: if true;
+      allow list: if isAdmin();
+      allow create, update: if isAdmin() && isValidClientInvitation(emailKey, request.resource.data);
+      allow delete: if isAdmin();
+    }
+  }
+}

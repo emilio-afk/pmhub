@@ -1,0 +1,5 @@
+{
+  "name": "Project Management Hub",
+  "description": "A project management web app with client access, Kanban boards, checklists, and real-time progress reports.",
+  "requestFramePermissions": []
+}

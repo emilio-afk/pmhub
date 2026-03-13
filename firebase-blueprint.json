@@ -1,0 +1,64 @@
+{
+  "entities": {
+    "users": {
+      "title": "User",
+      "description": "User profile and role information.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "client"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "projects": {
+      "title": "Project",
+      "description": "A project managed in the system.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "on-hold", "completed"] },
+        "clientUid": { "type": "string", "description": "UID of the client assigned to this project" },
+        "adminUid": { "type": "string", "description": "UID of the admin who created the project" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "status", "adminUid"]
+    },
+    "tasks": {
+      "title": "Task",
+      "description": "A task within a project.",
+      "type": "object",
+      "properties": {
+        "projectId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["todo", "in-progress", "done"] },
+        "order": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["projectId", "title", "status", "order"]
+    },
+    "checklists": {
+      "title": "Checklist Item",
+      "description": "A checklist item belonging to a task.",
+      "type": "object",
+      "properties": {
+        "taskId": { "type": "string" },
+        "text": { "type": "string" },
+        "completed": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["taskId", "text", "completed"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": { "schema": "users", "description": "User profiles" },
+    "/projects/{projectId}": { "schema": "projects", "description": "Project details" },
+    "/projects/{projectId}/tasks/{taskId}": { "schema": "tasks", "description": "Tasks for a project" },
+    "/projects/{projectId}/tasks/{taskId}/checklists/{checklistId}": { "schema": "checklists", "description": "Checklist items for a task" }
+  }
+}
