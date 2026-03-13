@@ -132,6 +132,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty';
+import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -194,6 +195,12 @@ interface ClientInvitation {
   displayName: string;
   invitedAt: string;
   invitedBy: string;
+}
+
+interface AdminAccessSettings {
+  adminEmails: string[];
+  updatedAt: string;
+  updatedBy: string;
 }
 
 interface Task {
@@ -393,6 +400,23 @@ const translations = {
     language: 'Language',
     dashboard: 'Dashboard',
     clients: 'Clients',
+    adminAccess: 'Admin access',
+    adminAccessNote: 'Add emails that should manage projects and client access. Existing users are promoted automatically.',
+    addAdmin: 'Add Admin',
+    activeAdmins: 'Active admins',
+    pendingAdmins: 'Pending admin emails',
+    noPendingAdmins: 'No pending admin emails.',
+    adminAccessAdded: 'Admin access granted.',
+    adminAccessRemoved: 'Admin access removed.',
+    adminAlreadyAdded: 'This email already has admin access.',
+    invalidAdminEmail: 'Enter a valid admin email.',
+    defaultAdminBadge: 'Default',
+    pendingBadge: 'Pending login',
+    activeBadge: 'Active',
+    removeAdmin: 'Remove admin',
+    removeAdminConfirm: 'This will remove admin access for this email. Continue?',
+    removeDefaultAdminError: 'This admin is protected by environment config.',
+    removeSelfAdminError: 'You cannot remove your own admin access from this screen.',
     addClient: 'Add Client',
     inviteClient: 'Invite Client',
     invitedClients: 'Pending invitations',
@@ -515,6 +539,23 @@ const translations = {
     language: 'Idioma',
     dashboard: 'Panel',
     clients: 'Clientes',
+    adminAccess: 'Acceso admin',
+    adminAccessNote: 'Agrega correos que deben administrar proyectos y acceso de clientes. Si el usuario ya existe, se promueve automaticamente.',
+    addAdmin: 'Agregar admin',
+    activeAdmins: 'Admins activos',
+    pendingAdmins: 'Correos admin pendientes',
+    noPendingAdmins: 'No hay correos admin pendientes.',
+    adminAccessAdded: 'Acceso admin otorgado.',
+    adminAccessRemoved: 'Acceso admin eliminado.',
+    adminAlreadyAdded: 'Este correo ya tiene acceso admin.',
+    invalidAdminEmail: 'Ingresa un correo admin valido.',
+    defaultAdminBadge: 'Base',
+    pendingBadge: 'Pendiente',
+    activeBadge: 'Activo',
+    removeAdmin: 'Quitar admin',
+    removeAdminConfirm: 'Esto quitara el acceso admin de este correo. Continuar?',
+    removeDefaultAdminError: 'Este admin esta protegido por la configuracion del entorno.',
+    removeSelfAdminError: 'No puedes quitar tu propio acceso admin desde esta pantalla.',
     addClient: 'Agregar cliente',
     inviteClient: 'Invitar cliente',
     invitedClients: 'Invitaciones pendientes',
@@ -940,7 +981,27 @@ const workspaceLabels = {
 
 const getLocale = (language: Language) => language === 'es' ? 'es-MX' : 'en-US';
 const normalizeEmail = (email: string) => email.trim().toLowerCase();
-const ADMIN_EMAIL = 'emilio@astrolab.mx';
+const DEFAULT_ADMIN_EMAIL = 'emilio@astrolab.mx';
+const ADMIN_EMAILS = (import.meta.env.VITE_ADMIN_EMAILS ?? DEFAULT_ADMIN_EMAIL)
+  .split(',')
+  .map(normalizeEmail)
+  .filter(Boolean);
+const isProtectedAdminEmail = (email: string) => ADMIN_EMAILS.includes(normalizeEmail(email));
+const getManagedAdminEmails = (emails: string[]) =>
+  emails
+    .map(normalizeEmail)
+    .filter(Boolean)
+    .filter(email => !isProtectedAdminEmail(email));
+const mergeAdminEmails = (emails: string[]) =>
+  Array.from(new Set([...ADMIN_EMAILS, ...getManagedAdminEmails(emails)])).sort((left, right) => left.localeCompare(right));
+const readAdminEmails = (value: unknown) => Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
+const getAdminAccessRef = () => doc(db, 'appConfig', 'access');
+const getAdminEmailsConfig = async () => {
+  const accessSnapshot = await getDoc(getAdminAccessRef());
+  return accessSnapshot.exists()
+    ? mergeAdminEmails(readAdminEmails(accessSnapshot.data().adminEmails))
+    : mergeAdminEmails([]);
+};
 const EMAIL_LINK_STORAGE_KEY = 'pmhub-email-link';
 const FOCUSABLE_MODAL_SELECTORS = [
   'a[href]',
@@ -1346,7 +1407,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       throw new Error('Ingresa un correo valido.');
     }
 
-    if (normalizedEmail === ADMIN_EMAIL) {
+    const adminEmails = await getAdminEmailsConfig();
+    if (adminEmails.includes(normalizedEmail)) {
       return null;
     }
 
@@ -1371,15 +1433,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const docRef = doc(db, 'users', user.uid);
         const docSnap = await getDoc(docRef);
+        const normalizedEmail = normalizeEmail(user.email || '');
+        const adminEmails = await getAdminEmailsConfig();
+        const hasAdminAccess = adminEmails.includes(normalizedEmail);
 
         if (docSnap.exists()) {
-          setProfile(docSnap.data() as UserProfile);
+          const existingProfile = docSnap.data() as UserProfile;
+          if (hasAdminAccess && existingProfile.role !== 'admin') {
+            const nextProfile: UserProfile = { ...existingProfile, role: 'admin' };
+            await updateDoc(docRef, { role: 'admin' });
+            setProfile(nextProfile);
+          } else {
+            setProfile(existingProfile);
+          }
           setAuthError(null);
         } else {
-          const normalizedEmail = normalizeEmail(user.email || '');
-          const isAdmin = normalizedEmail === ADMIN_EMAIL;
-
-          if (isAdmin) {
+          if (hasAdminAccess) {
             const newProfile: UserProfile = {
               uid: user.uid,
               email: normalizedEmail,
@@ -1806,17 +1875,18 @@ const CommentsThread = ({
 // --- Components ---
 
 const Sidebar = () => {
-  const { profile, logout } = useAuth();
+  const { user, profile, logout } = useAuth();
   const { language } = useLanguage();
   const t = translations[language];
   const labels = workspaceLabels[language];
   const navigate = useNavigate();
   const location = useLocation();
   const projectMatch = useMatch('/project/:projectId');
+  const canAccessAdminUi = profile?.role === 'admin' || isProtectedAdminEmail(user?.email || '');
 
   const menuItems = [
     { icon: House, label: t.dashboard, path: '/' },
-    ...(profile?.role === 'admin' ? [{ icon: Handshake, label: t.clients, path: '/clients' }] : []),
+    ...(canAccessAdminUi ? [{ icon: Handshake, label: t.clients, path: '/clients' }] : []),
   ];
   const projectSectionItems = getProjectSectionItems(language);
   const activeProjectSection = (() => {
@@ -1886,11 +1956,11 @@ const Sidebar = () => {
       <div className="mt-auto border-t border-white/10 p-5">
         <div className="flex items-center gap-3 mb-5">
           <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-white/10">
-            {profile?.displayName?.[0] || 'U'}
+            {profile?.displayName?.[0] || user?.displayName?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="truncate text-sm font-semibold text-white">{profile?.displayName}</p>
-            <p className="truncate text-xs capitalize text-[#8fb0c7]">{profile?.role}</p>
+            <p className="truncate text-sm font-semibold text-white">{profile?.displayName || user?.displayName || user?.email}</p>
+            <p className="truncate text-xs capitalize text-[#8fb0c7]">{profile?.role || (canAccessAdminUi ? 'admin' : '')}</p>
           </div>
         </div>
         <div className="mb-4">
@@ -1910,7 +1980,7 @@ const Sidebar = () => {
 };
 
 const Dashboard = () => {
-  const { profile } = useAuth();
+  const { user, profile } = useAuth();
   const { language } = useLanguage();
   const t = translations[language];
   const navigate = useNavigate();
@@ -1921,6 +1991,7 @@ const Dashboard = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newProject, setNewProject] = useState<ProjectFormState>(getInitialProjectForm());
   const [clients, setClients] = useState<UserProfile[]>([]);
+  const canAccessAdminUi = profile?.role === 'admin' || isProtectedAdminEmail(user?.email || '');
 
   useAccessibleModal({
     isOpen: showAddModal,
@@ -1931,12 +2002,13 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    if (!profile) return;
+    if (!user) return;
 
     const unsubscribers: Array<() => void> = [];
+    const currentUid = profile?.uid ?? user.uid;
 
-    if (profile.role === 'admin') {
-      const projectsQuery = query(collection(db, 'projects'), where('adminUid', '==', profile.uid));
+    if (canAccessAdminUi) {
+      const projectsQuery = query(collection(db, 'projects'), where('adminUid', '==', currentUid));
       unsubscribers.push(
         onSnapshot(projectsQuery, (snapshot) => {
           setProjects(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Project)));
@@ -1953,8 +2025,8 @@ const Dashboard = () => {
         setProjects(Array.from(projectMap.values()));
       };
 
-      const legacyQuery = query(collection(db, 'projects'), where('clientUid', '==', profile.uid));
-      const memberQuery = query(collection(db, 'projects'), where('memberUids', 'array-contains', profile.uid));
+      const legacyQuery = query(collection(db, 'projects'), where('clientUid', '==', currentUid));
+      const memberQuery = query(collection(db, 'projects'), where('memberUids', 'array-contains', currentUid));
 
       unsubscribers.push(
         onSnapshot(legacyQuery, snapshot => {
@@ -1971,7 +2043,7 @@ const Dashboard = () => {
       );
     }
 
-    if (profile.role === 'admin') {
+    if (canAccessAdminUi) {
       const clientsQ = query(collection(db, 'users'), where('role', '==', 'client'));
       unsubscribers.push(
         onSnapshot(clientsQ, (snapshot) => {
@@ -1983,7 +2055,7 @@ const Dashboard = () => {
     return () => {
       unsubscribers.forEach(unsubscribe => unsubscribe());
     };
-  }, [profile]);
+  }, [user, profile, canAccessAdminUi]);
 
   const handleAddProject = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -2034,7 +2106,7 @@ const Dashboard = () => {
           <h1 className="ui-text-main text-3xl font-bold">{t.projects}</h1>
           <p className="ui-text-subtle">{t.manageProjects}</p>
         </div>
-        {profile?.role === 'admin' && (
+        {canAccessAdminUi && (
           <button
             ref={addProjectButtonRef}
             type="button"
@@ -2074,7 +2146,7 @@ const Dashboard = () => {
                 <CalendarDays size={14} />
                 {new Date(project.createdAt).toLocaleDateString(getLocale(language))}
               </div>
-              {profile?.role === 'admin' && (
+              {canAccessAdminUi && (
                 <div className="flex items-center gap-1">
                   <Handshake size={14} />
                   {getAssignedClientUids(project).length}
@@ -2213,7 +2285,7 @@ const ProjectDetails = () => {
   const [executionStatusFilter, setExecutionStatusFilter] = useState<'all' | Task['status']>('all');
   const [executionApprovalFilter, setExecutionApprovalFilter] = useState<'all' | 'requires-approval'>('all');
 
-  const canManage = profile?.role === 'admin';
+  const canManage = profile?.role === 'admin' || isProtectedAdminEmail(user?.email || '');
   const activeSection = (() => {
     const value = searchParams.get('section');
     return isProjectSectionId(value) ? value : 'overview';
@@ -2294,7 +2366,7 @@ const ProjectDetails = () => {
       }),
     );
 
-    if (profile?.role === 'admin') {
+    if (profile?.role === 'admin' || isProtectedAdminEmail(user?.email || '')) {
       unsubscribers.push(
         onSnapshot(query(collection(db, 'users'), where('role', '==', 'client')), snapshot => {
           setClients(snapshot.docs.map(doc => doc.data() as UserProfile));
@@ -4656,16 +4728,20 @@ const AuthenticatedLayout = ({ children }: { children: React.ReactNode }) => {
 };
 
 const ClientsList = () => {
-  const { profile } = useAuth();
+  const { user, profile } = useAuth();
   const { language } = useLanguage();
   const t = translations[language];
   const inviteClientButtonRef = useRef<HTMLButtonElement>(null);
   const inviteModalRef = useRef<HTMLDivElement>(null);
   const inviteNameInputRef = useRef<HTMLInputElement>(null);
   const [clients, setClients] = useState<UserProfile[]>([]);
+  const [adminUsers, setAdminUsers] = useState<UserProfile[]>([]);
+  const [adminEmails, setAdminEmails] = useState<string[]>(mergeAdminEmails([]));
   const [invitations, setInvitations] = useState<ClientInvitation[]>([]);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [newInvitation, setNewInvitation] = useState({ displayName: '', email: '' });
+  const [newAdminEmail, setNewAdminEmail] = useState('');
+  const canAccessAdminUi = profile?.role === 'admin' || isProtectedAdminEmail(user?.email || '');
 
   useAccessibleModal({
     isOpen: showInviteModal,
@@ -4677,25 +4753,99 @@ const ClientsList = () => {
 
   useEffect(() => {
     const clientsQuery = query(collection(db, 'users'), where('role', '==', 'client'));
+    const adminUsersQuery = query(collection(db, 'users'), where('role', '==', 'admin'));
     const invitationsQuery = query(collection(db, 'clientInvitations'), orderBy('invitedAt', 'desc'));
+    const accessConfigRef = getAdminAccessRef();
 
     const unsubscribeClients = onSnapshot(clientsQuery, (snapshot) => {
       setClients(snapshot.docs.map(doc => doc.data() as UserProfile));
+    });
+
+    const unsubscribeAdmins = onSnapshot(adminUsersQuery, snapshot => {
+      setAdminUsers(snapshot.docs.map(doc => doc.data() as UserProfile));
     });
 
     const unsubscribeInvitations = onSnapshot(invitationsQuery, snapshot => {
       setInvitations(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ClientInvitation)));
     });
 
+    const unsubscribeAccess = onSnapshot(accessConfigRef, snapshot => {
+      const nextEmails = snapshot.exists()
+        ? mergeAdminEmails(readAdminEmails(snapshot.data().adminEmails))
+        : mergeAdminEmails([]);
+      setAdminEmails(nextEmails);
+    });
+
     return () => {
       unsubscribeClients();
+      unsubscribeAdmins();
       unsubscribeInvitations();
+      unsubscribeAccess();
     };
   }, []);
 
   const pendingInvitations = invitations.filter(invitation =>
     !clients.some(client => normalizeEmail(client.email) === normalizeEmail(invitation.email)),
   );
+  const activeAdminEmailSet = new Set(adminUsers.map(admin => normalizeEmail(admin.email)));
+  const pendingAdminEmails = adminEmails.filter(email => !activeAdminEmailSet.has(email));
+
+  const saveManagedAdminEmails = async (emails: string[]) => {
+    await setDoc(getAdminAccessRef(), {
+      adminEmails: getManagedAdminEmails(emails),
+      updatedAt: new Date().toISOString(),
+      updatedBy: profile?.uid ?? user?.uid ?? 'admin',
+    } satisfies AdminAccessSettings);
+  };
+
+  const handleAddAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const normalizedEmail = normalizeEmail(newAdminEmail);
+    if (!normalizedEmail) {
+      toast.error(t.invalidAdminEmail);
+      return;
+    }
+
+    if (adminEmails.includes(normalizedEmail)) {
+      toast.error(t.adminAlreadyAdded);
+      return;
+    }
+
+    await saveManagedAdminEmails([...adminEmails, normalizedEmail]);
+
+    const existingAdmins = await getDocs(query(collection(db, 'users'), where('email', '==', normalizedEmail)));
+    await Promise.all(
+      existingAdmins.docs.map(adminDoc => updateDoc(doc(db, 'users', adminDoc.id), { role: 'admin' })),
+    );
+
+    setNewAdminEmail('');
+    toast.success(t.adminAccessAdded);
+  };
+
+  const removeAdminAccess = async (email: string) => {
+    const normalizedEmail = normalizeEmail(email);
+    if (isProtectedAdminEmail(normalizedEmail)) {
+      toast.error(t.removeDefaultAdminError);
+      return;
+    }
+
+    if (normalizeEmail((profile?.email ?? user?.email) || '') === normalizedEmail) {
+      toast.error(t.removeSelfAdminError);
+      return;
+    }
+
+    if (!window.confirm(t.removeAdminConfirm)) return;
+
+    await saveManagedAdminEmails(adminEmails.filter(item => item !== normalizedEmail));
+
+    const existingAdmins = await getDocs(query(collection(db, 'users'), where('email', '==', normalizedEmail)));
+    await Promise.all(
+      existingAdmins.docs.map(adminDoc => updateDoc(doc(db, 'users', adminDoc.id), { role: 'client' })),
+    );
+
+    toast.success(t.adminAccessRemoved);
+  };
 
   const handleInviteClient = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -4750,7 +4900,7 @@ const ClientsList = () => {
     ]);
   };
 
-  if (profile?.role !== 'admin') {
+  if (!canAccessAdminUi) {
     return <Navigate to="/" replace />;
   }
 
@@ -4770,6 +4920,105 @@ const ClientsList = () => {
           <Plus size={18} />
           {t.addClient}
         </button>
+      </div>
+
+      <div className="ui-panel-card mb-8 rounded-3xl p-6">
+        <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
+          <div className="max-w-2xl">
+            <h2 className="ui-text-main text-lg font-bold">{t.adminAccess}</h2>
+            <p className="ui-text-subtle mt-2 text-sm leading-6">{t.adminAccessNote}</p>
+          </div>
+          <form onSubmit={handleAddAdmin} className="w-full max-w-xl">
+            <FieldGroup className="gap-3">
+              <Field>
+                <FieldLabel htmlFor="admin-email">{t.accessEmail}</FieldLabel>
+                <Input
+                  id="admin-email"
+                  type="email"
+                  value={newAdminEmail}
+                  onChange={event => setNewAdminEmail(event.target.value)}
+                  placeholder={t.emailPlaceholder}
+                  className="ui-form-field h-12 rounded-xl px-4"
+                />
+                <FieldDescription>{t.addAdmin}</FieldDescription>
+              </Field>
+              <div className="flex justify-end">
+                <Button type="submit" className="ui-action-primary rounded-xl px-5 py-3 font-semibold">
+                  {t.addAdmin}
+                </Button>
+              </div>
+            </FieldGroup>
+          </form>
+        </div>
+
+        <div className="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-2">
+          <div className="ui-panel-soft rounded-2xl p-5">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h3 className="ui-text-main text-sm font-semibold uppercase tracking-[0.14em]">{t.activeAdmins}</h3>
+              <Badge variant="outline" className="border-[#b9ddd3] bg-[#e4f3ef] text-[#27695f]">{adminUsers.length}</Badge>
+            </div>
+            <div className="flex flex-col gap-3">
+              {adminUsers.map(admin => {
+                const normalizedEmail = normalizeEmail(admin.email);
+                const isProtected = isProtectedAdminEmail(normalizedEmail);
+                return (
+                  <div key={admin.uid} className="ui-panel-card flex items-center justify-between gap-3 rounded-2xl px-4 py-3">
+                    <div className="min-w-0">
+                      <p className="ui-text-main truncate text-sm font-semibold">{admin.displayName || admin.email}</p>
+                      <p className="ui-text-subtle truncate text-sm">{admin.email}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="border-[#b9ddd3] bg-[#e4f3ef] text-[#27695f]">{t.activeBadge}</Badge>
+                      {isProtected && (
+                        <Badge variant="outline" className="border-slate-200 bg-slate-50 text-slate-700">{t.defaultAdminBadge}</Badge>
+                      )}
+                      {!isProtected && (
+                        <Button type="button" variant="outline" onClick={() => { void removeAdminAccess(admin.email); }} className="rounded-xl text-sm">
+                          {t.removeAdmin}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="ui-panel-soft rounded-2xl p-5">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h3 className="ui-text-main text-sm font-semibold uppercase tracking-[0.14em]">{t.pendingAdmins}</h3>
+              <Badge variant="outline" className="border-[#b7d5e5] bg-[#e9f4fa] text-[#245b7d]">{pendingAdminEmails.length}</Badge>
+            </div>
+            {pendingAdminEmails.length === 0 ? (
+              <p className="ui-text-subtle text-sm">{t.noPendingAdmins}</p>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {pendingAdminEmails.map(email => {
+                  const isProtected = isProtectedAdminEmail(email);
+                  return (
+                    <div key={email} className="ui-panel-card flex items-center justify-between gap-3 rounded-2xl px-4 py-3">
+                      <div className="min-w-0">
+                        <p className="ui-text-main truncate text-sm font-semibold">{email}</p>
+                        <p className="ui-text-subtle text-sm">{t.pendingBadge}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="border-[#b7d5e5] bg-[#e9f4fa] text-[#245b7d]">{t.pendingBadge}</Badge>
+                        {isProtected && (
+                          <Badge variant="outline" className="border-slate-200 bg-slate-50 text-slate-700">{t.defaultAdminBadge}</Badge>
+                        )}
+                        {!isProtected && (
+                          <Button type="button" variant="outline" onClick={() => { void removeAdminAccess(email); }} className="rounded-xl text-sm">
+                            {t.removeAdmin}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="ui-panel-card mb-8 overflow-hidden rounded-3xl">

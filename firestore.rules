@@ -308,6 +308,13 @@ service cloud.firestore {
              data.createdAt is string;
     }
 
+    function isValidAdminAccessSettings(data) {
+      return data.keys().hasAll(['adminEmails', 'updatedAt', 'updatedBy']) &&
+             data.adminEmails is list &&
+             data.updatedAt is string &&
+             data.updatedBy is string;
+    }
+
     // ===============================================================
     // Rules
     // ===============================================================
@@ -325,7 +332,18 @@ service cloud.firestore {
                         hasCurrentEmailInvitation()
                       )
                     );
-      allow update: if isAuthenticated() && request.auth.uid == uid && isValidUser(request.resource.data) && request.resource.data.role == resource.data.role;
+      allow update: if isAuthenticated() &&
+                    isValidUser(request.resource.data) &&
+                    (
+                      (request.auth.uid == uid && request.resource.data.role == resource.data.role) ||
+                      isAdmin()
+                    );
+      allow delete: if isAdmin();
+    }
+
+    match /appConfig/{configId} {
+      allow read: if isAdmin();
+      allow create, update: if isAdmin() && isValidAdminAccessSettings(request.resource.data);
       allow delete: if isAdmin();
     }
 
