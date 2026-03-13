@@ -1197,15 +1197,15 @@ const formatCurrency = (value: number | undefined, language: Language) => {
 const clampPercent = (value: number) => Math.max(0, Math.min(100, Math.round(value)));
 
 const getHealthClasses = (health: ProjectHealth) => ({
-  green: 'border-emerald-200 bg-emerald-50 text-emerald-800',
-  yellow: 'border-amber-200 bg-amber-50 text-amber-800',
+  green: 'border-[#b9ddd3] bg-[#e4f3ef] text-[#27695f]',
+  yellow: 'border-amber-200 bg-amber-50 text-amber-900',
   red: 'border-rose-200 bg-rose-50 text-rose-800',
 })[health];
 
 const getHealthDotClasses = (health: ProjectHealth) => ({
-  green: 'bg-emerald-500',
-  yellow: 'bg-amber-500',
-  red: 'bg-rose-500',
+  green: 'bg-[#4b9b8a]',
+  yellow: 'bg-[#d8a34f]',
+  red: 'bg-[#c96b58]',
 })[health];
 
 const isProjectSectionId = (value: string | null): value is ProjectSectionId => (
@@ -1225,40 +1225,40 @@ const getProjectSectionItems = (language: Language): Omit<ProjectNavItem, 'badge
 };
 
 const getMilestoneClasses = (status: MilestoneStatus) => ({
-  planned: 'border-slate-200 bg-slate-100 text-slate-800',
-  'at-risk': 'border-amber-200 bg-amber-50 text-amber-800',
-  completed: 'border-emerald-200 bg-emerald-50 text-emerald-800',
+  planned: 'border-slate-200 bg-slate-100/90 text-slate-800',
+  'at-risk': 'border-amber-200 bg-amber-50 text-amber-900',
+  completed: 'border-[#b9ddd3] bg-[#e4f3ef] text-[#27695f]',
 })[status];
 
 const getApprovalClasses = (status: ApprovalStatus) => ({
-  pending: 'border-amber-200 bg-amber-50 text-amber-800',
-  approved: 'border-emerald-200 bg-emerald-50 text-emerald-800',
+  pending: 'border-amber-200 bg-amber-50 text-amber-900',
+  approved: 'border-[#b9ddd3] bg-[#e4f3ef] text-[#27695f]',
   'changes-requested': 'border-rose-200 bg-rose-50 text-rose-800',
 })[status];
 
 const getRiskClasses = (impact: RiskImpact) => ({
-  low: 'border-slate-200 bg-slate-100 text-slate-800',
-  medium: 'border-amber-200 bg-amber-50 text-amber-800',
+  low: 'border-slate-200 bg-slate-100/90 text-slate-800',
+  medium: 'border-amber-200 bg-amber-50 text-amber-900',
   high: 'border-rose-200 bg-rose-50 text-rose-800',
 })[impact];
 
 const getDeliverableClasses = (status: DeliverableStatus) => ({
-  draft: 'border-slate-200 bg-slate-100 text-slate-800',
-  shared: 'border-sky-200 bg-sky-50 text-sky-800',
-  approved: 'border-emerald-200 bg-emerald-50 text-emerald-800',
+  draft: 'border-slate-200 bg-slate-100/90 text-slate-800',
+  shared: 'border-[#b7d5e5] bg-[#e9f4fa] text-[#245b7d]',
+  approved: 'border-[#b9ddd3] bg-[#e4f3ef] text-[#27695f]',
 })[status];
 
 const getClientActionClasses = (status: ClientActionStatus) => ({
-  pending: 'border-amber-200 bg-amber-50 text-amber-800',
-  submitted: 'border-sky-200 bg-sky-50 text-sky-800',
-  done: 'border-emerald-200 bg-emerald-50 text-emerald-800',
+  pending: 'border-amber-200 bg-amber-50 text-amber-900',
+  submitted: 'border-[#b7d5e5] bg-[#e9f4fa] text-[#245b7d]',
+  done: 'border-[#b9ddd3] bg-[#e4f3ef] text-[#27695f]',
 })[status];
 
 const getTaskStatusClasses = (status: Task['status']) => ({
-  todo: 'border-slate-200 bg-slate-100 text-slate-800',
-  'in-progress': 'border-amber-200 bg-amber-50 text-amber-800',
-  approval: 'border-sky-200 bg-sky-50 text-sky-800',
-  done: 'border-emerald-200 bg-emerald-50 text-emerald-800',
+  todo: 'border-slate-200 bg-slate-100/90 text-slate-800',
+  'in-progress': 'border-amber-200 bg-amber-50 text-amber-900',
+  approval: 'border-[#b7d5e5] bg-[#e9f4fa] text-[#245b7d]',
+  done: 'border-[#b9ddd3] bg-[#e4f3ef] text-[#27695f]',
 })[status];
 
 const touchProject = async (projectId: string) => {
@@ -1554,7 +1554,7 @@ const LanguageSwitcher = () => {
   }, []);
 
   return (
-    <div ref={switcherRef} className="rounded-2xl border border-gray-200 bg-gray-50 px-3 py-3">
+    <div ref={switcherRef} className="ui-panel-soft rounded-2xl px-3 py-3">
       <button
         type="button"
         onClick={() => setIsOpen(current => !current)}
@@ -1563,17 +1563,17 @@ const LanguageSwitcher = () => {
         aria-label={t.language}
       >
         <span className="flex items-center justify-between">
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+          <span className="ui-kicker text-[11px] font-semibold uppercase tracking-wider">
             {t.language}
           </span>
           <ChevronRight
             size={14}
-            className={`text-gray-400 transition-transform ${isOpen ? 'rotate-90' : ''}`}
+            className={`ui-kicker transition-transform ${isOpen ? 'rotate-90' : ''}`}
           />
         </span>
       </button>
       {isOpen && (
-        <div className="mt-2 flex items-center bg-white rounded-xl p-1 border border-gray-200">
+        <div className="ui-panel-card mt-2 flex items-center rounded-xl p-1">
           <button
             type="button"
             onClick={() => {
@@ -1581,7 +1581,7 @@ const LanguageSwitcher = () => {
               setIsOpen(false);
             }}
             className={`ui-focus-ring flex-1 rounded-lg px-3 py-1.5 text-xs font-bold transition-colors ${
-              language === 'es' ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-500 hover:text-gray-800'
+              language === 'es' ? 'bg-[#17324d] text-white shadow-sm' : 'ui-text-subtle hover:text-[#17324d]'
             }`}
           >
             ES
@@ -1593,7 +1593,7 @@ const LanguageSwitcher = () => {
               setIsOpen(false);
             }}
             className={`ui-focus-ring flex-1 rounded-lg px-3 py-1.5 text-xs font-bold transition-colors ${
-              language === 'en' ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-500 hover:text-gray-800'
+              language === 'en' ? 'bg-[#17324d] text-white shadow-sm' : 'ui-text-subtle hover:text-[#17324d]'
             }`}
           >
             EN
@@ -1623,20 +1623,20 @@ const ClientAccessPicker = ({
     <div>
       <div className="flex items-center justify-between gap-4 mb-3">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">{title}</label>
-          <p className="text-xs text-gray-500">{helperText}</p>
+          <label className="ui-text-main block text-sm font-medium mb-1">{title}</label>
+          <p className="ui-text-subtle text-xs">{helperText}</p>
         </div>
-        <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+        <span className="ui-kicker rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold">
           {selectedUids.length}
         </span>
       </div>
 
       {clients.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-gray-200 px-4 py-5 text-sm text-gray-500">
+        <div className="ui-panel-soft rounded-2xl border-dashed px-4 py-5 text-sm ui-text-subtle">
           {emptyText}
         </div>
       ) : (
-        <div className="max-h-56 overflow-y-auto space-y-2 rounded-2xl border border-gray-200 p-3 bg-gray-50/70">
+        <div className="ui-panel-soft max-h-56 space-y-2 overflow-y-auto rounded-2xl p-3">
           {clients.map(client => {
             const isSelected = selectedUids.includes(client.uid);
 
@@ -1644,18 +1644,18 @@ const ClientAccessPicker = ({
               <label
                 key={client.uid}
                 className={`flex items-start gap-3 rounded-xl border px-3 py-3 cursor-pointer transition-colors ${
-                  isSelected ? 'border-gray-900 bg-white' : 'border-transparent bg-white/70 hover:border-gray-200'
+                  isSelected ? 'border-[#17324d] bg-white' : 'border-transparent bg-white/75 hover:border-slate-200'
                 }`}
               >
                 <input
                   type="checkbox"
                   checked={isSelected}
                   onChange={() => onToggle(client.uid)}
-                  className="mt-1 h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+                  className="mt-1 h-4 w-4 rounded border-slate-300 text-[#17324d] focus:ring-[#17324d]"
                 />
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 truncate">{client.displayName || client.email}</p>
-                  <p className="text-xs text-gray-500 truncate">{client.email}</p>
+                  <p className="ui-text-main truncate text-sm font-semibold">{client.displayName || client.email}</p>
+                  <p className="ui-text-subtle truncate text-xs">{client.email}</p>
                 </div>
               </label>
             );
@@ -1667,12 +1667,12 @@ const ClientAccessPicker = ({
 };
 
 const EmptyCollectionState = ({ message }: { message: string }) => (
-  <Empty className="rounded-2xl border border-dashed border-gray-200 bg-gray-50/80 px-4 py-6">
+  <Empty className="ui-panel-soft rounded-2xl border-dashed px-4 py-6">
     <EmptyHeader>
       <EmptyMedia variant="icon" className="bg-slate-100 text-slate-500 ring-1 ring-slate-200 [&_svg]:size-4">
         <FolderOpen />
       </EmptyMedia>
-      <EmptyTitle className="text-gray-700">{message}</EmptyTitle>
+      <EmptyTitle className="ui-text-subtle">{message}</EmptyTitle>
     </EmptyHeader>
   </Empty>
 );
@@ -1689,7 +1689,7 @@ const SectionActionButton = ({
   <button
     type="button"
     onClick={onClick}
-    className="ui-focus-ring ui-interactive-button inline-flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-gray-200/80 transition-colors hover:bg-gray-800"
+    className="ui-focus-ring ui-interactive-button ui-action-primary inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-colors"
   >
     <Icon size={16} />
     {label}
@@ -1706,7 +1706,7 @@ const InlineEditButton = ({
   <button
     type="button"
     onClick={onClick}
-    className="ui-focus-ring ui-interactive-button inline-flex items-center gap-2 rounded-xl border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
+    className="ui-focus-ring ui-interactive-button ui-action-secondary inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 text-sm font-medium transition-colors"
   >
     <Pencil size={14} />
     {label}
@@ -1755,20 +1755,20 @@ const CommentsThread = ({
   };
 
   return (
-    <div className={`rounded-2xl p-4 ${isCode ? 'border border-slate-200 bg-white/90' : 'mt-4 border border-gray-100 bg-gray-50/80'}`}>
+    <div className={`rounded-2xl p-4 ${isCode ? 'ui-panel-card' : 'ui-panel-soft mt-4'}`}>
       <div className="flex items-center gap-2 mb-3">
-        <MessageSquare size={15} className={isCode ? 'text-slate-500' : 'text-gray-400'} />
-        <span className={`text-xs font-bold uppercase tracking-wider ${isCode ? 'kanban-ui-font text-slate-500' : 'text-gray-400'}`}>{labels.comments}</span>
+        <MessageSquare size={15} className={isCode ? 'text-slate-500' : 'text-[#6b8094]'} />
+        <span className={`text-xs font-bold uppercase tracking-wider ${isCode ? 'kanban-ui-font text-slate-500' : 'text-[#6b8094]'}`}>{labels.comments}</span>
       </div>
       <div className="space-y-3">
         {threadComments.length === 0 ? (
-          <p className={`text-sm ${isCode ? 'kanban-ui-font text-slate-500' : 'text-gray-500'}`}>{labels.noComments}</p>
+          <p className={`text-sm ${isCode ? 'kanban-ui-font text-slate-500' : 'text-[#5f7387]'}`}>{labels.noComments}</p>
         ) : (
           threadComments.map(comment => (
-            <div key={comment.id} className={`rounded-2xl px-4 py-3 ${isCode ? 'border border-slate-200 bg-slate-50/80' : 'bg-white border border-gray-100'}`}>
+            <div key={comment.id} className={`rounded-2xl px-4 py-3 ${isCode ? 'border border-slate-200 bg-slate-50/80' : 'ui-panel-card'}`}>
               <div className="flex items-center justify-between gap-3 mb-1">
-                <span className={`text-sm font-semibold ${isCode ? 'kanban-ui-font text-slate-900' : 'text-gray-900'}`}>{comment.authorName}</span>
-                <span className={`text-xs ${isCode ? 'kanban-code-font text-slate-500' : 'text-gray-400'}`}>{formatDateTimeLabel(comment.createdAt, language)}</span>
+                <span className={`text-sm font-semibold ${isCode ? 'kanban-ui-font text-slate-900' : 'text-[#102033]'}`}>{comment.authorName}</span>
+                <span className={`text-xs ${isCode ? 'kanban-code-font text-slate-500' : 'text-[#6b8094]'}`}>{formatDateTimeLabel(comment.createdAt, language)}</span>
               </div>
               <p className={`text-sm whitespace-pre-wrap ${isCode ? 'kanban-ui-font text-slate-700' : 'text-gray-600'}`}>{comment.message}</p>
             </div>
@@ -1784,14 +1784,14 @@ const CommentsThread = ({
             placeholder={labels.addContextComment}
             className={`w-full rounded-2xl px-4 py-3 text-sm resize-none ${isCode
               ? 'kanban-ui-font min-h-0 border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:border-sky-400/30 focus-visible:ring-0'
-              : 'min-h-0 border-gray-200 bg-white text-gray-700 focus-visible:border-gray-900 focus-visible:ring-2 focus-visible:ring-gray-900/10'}`}
+              : 'ui-form-field min-h-0'}`}
           />
           <div className="flex justify-end">
             <button
               type="submit"
               className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-colors ${isCode
                 ? 'kanban-ui-font border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100'
-                : 'bg-gray-900 text-white hover:bg-gray-800'}`}
+                : 'ui-action-primary'}`}
             >
               <Send size={14} />
               {labels.addComment}
@@ -1826,10 +1826,10 @@ const Sidebar = () => {
   })();
 
   return (
-    <div className="w-[240px] bg-slate-50/95 border-r border-slate-200/80 flex flex-col h-screen sticky top-0 shrink-0 backdrop-blur">
+    <div className="sticky top-0 flex h-screen w-[240px] shrink-0 flex-col border-r border-[#1d3f61] bg-[#13283f]/98 text-[#eef6ff] backdrop-blur">
       <div className="p-5">
         <div className="flex items-center gap-3 mb-7">
-          <div className="flex size-10 items-center justify-center rounded-xl bg-gray-900 shadow-sm shadow-gray-200/80">
+          <div className="flex size-10 items-center justify-center rounded-xl bg-[#1f4263] shadow-sm shadow-black/20">
             <FolderOpen className="size-5 text-white" />
           </div>
           <span className="font-bold text-xl tracking-tight">PM Hub</span>
@@ -1841,9 +1841,9 @@ const Sidebar = () => {
               key={item.path}
               type="button"
               onClick={() => navigate(item.path)}
-              className="ui-focus-ring ui-interactive-button group flex w-full items-center gap-3 rounded-xl px-4 py-2.5 font-medium text-slate-600 transition-colors hover:bg-white hover:text-slate-900"
+              className="ui-focus-ring ui-interactive-button group flex w-full items-center gap-3 rounded-xl px-4 py-2.5 font-medium text-[#bfd2e3] transition-colors hover:bg-white/8 hover:text-white"
             >
-              <span className="flex size-5 items-center justify-center text-slate-500 transition-colors group-hover:text-slate-700">
+              <span className="flex size-5 items-center justify-center text-[#8fb0c7] transition-colors group-hover:text-white">
                 <item.icon size={18} />
               </span>
               {item.label}
@@ -1852,8 +1852,8 @@ const Sidebar = () => {
         </nav>
 
         {projectMatch && (
-          <div className="mt-7 pt-5 border-t border-slate-200/80">
-            <p className="px-4 mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400">
+          <div className="mt-7 border-t border-white/10 pt-5">
+            <p className="mb-3 px-4 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8fb0c7]">
               {labels.projectViews}
             </p>
             <div className="space-y-1">
@@ -1864,14 +1864,14 @@ const Sidebar = () => {
                   onClick={() => navigate(`${projectMatch.pathname}?section=${item.id}`)}
                   className={`ui-focus-ring ui-interactive-button group flex w-full items-center gap-3 rounded-xl px-4 py-2.5 transition-colors ${
                     activeProjectSection === item.id
-                      ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200/80'
-                      : 'text-slate-600 hover:bg-white hover:text-slate-900'
+                      ? 'bg-white text-[#13283f] shadow-sm ring-1 ring-white/10'
+                      : 'text-[#bfd2e3] hover:bg-white/8 hover:text-white'
                   }`}
                 >
                   <span className={`flex size-5 items-center justify-center transition-colors ${
                     activeProjectSection === item.id
-                      ? 'text-slate-700'
-                      : 'text-slate-500 group-hover:text-slate-700'
+                      ? 'text-[#1d3f61]'
+                      : 'text-[#8fb0c7] group-hover:text-white'
                   }`}>
                     <item.icon size={17} />
                   </span>
@@ -1883,14 +1883,14 @@ const Sidebar = () => {
         )}
       </div>
 
-      <div className="mt-auto p-5 border-t border-slate-200/80">
+      <div className="mt-auto border-t border-white/10 p-5">
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden">
+          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-white/10">
             {profile?.displayName?.[0] || 'U'}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-gray-900 truncate">{profile?.displayName}</p>
-            <p className="text-xs text-gray-500 truncate capitalize">{profile?.role}</p>
+            <p className="truncate text-sm font-semibold text-white">{profile?.displayName}</p>
+            <p className="truncate text-xs capitalize text-[#8fb0c7]">{profile?.role}</p>
           </div>
         </div>
         <div className="mb-4">
@@ -1899,7 +1899,7 @@ const Sidebar = () => {
         <button
           type="button"
           onClick={logout}
-          className="ui-focus-ring flex w-full items-center gap-3 rounded-xl px-4 py-3 font-medium text-red-600 transition-colors hover:bg-red-50"
+          className="ui-focus-ring flex w-full items-center gap-3 rounded-xl px-4 py-3 font-medium text-[#ffd1d7] transition-colors hover:bg-white/8"
         >
           <LogOut size={20} />
           {t.logout}
@@ -2031,15 +2031,15 @@ const Dashboard = () => {
     <div className="p-8 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t.projects}</h1>
-          <p className="text-gray-500">{t.manageProjects}</p>
+          <h1 className="ui-text-main text-3xl font-bold">{t.projects}</h1>
+          <p className="ui-text-subtle">{t.manageProjects}</p>
         </div>
         {profile?.role === 'admin' && (
           <button
             ref={addProjectButtonRef}
             type="button"
             onClick={() => setShowAddModal(true)}
-            className="ui-focus-ring ui-interactive-button flex items-center gap-2 rounded-xl bg-gray-900 px-6 py-3 font-medium text-white shadow-lg shadow-gray-200 transition-all hover:bg-gray-800"
+            className="ui-focus-ring ui-interactive-button ui-action-primary flex items-center gap-2 rounded-xl px-6 py-3 font-medium transition-all"
           >
             <Plus size={20} />
             {t.newProject}
@@ -2054,22 +2054,22 @@ const Dashboard = () => {
             key={project.id}
             type="button"
             onClick={() => navigate(`/project/${project.id}`)}
-            className="ui-focus-ring ui-interactive-card group cursor-pointer rounded-2xl border border-slate-200/70 bg-white p-6 text-left shadow-sm"
+            className="ui-focus-ring ui-interactive-card ui-panel-card group cursor-pointer rounded-2xl p-6 text-left"
           >
             <div className="flex justify-between items-start mb-4">
               <div className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${
-                project.status === 'active' ? 'bg-emerald-50 text-emerald-700' :
-                project.status === 'on-hold' ? 'bg-amber-50 text-amber-700' :
-                'bg-sky-50 text-sky-700'
+                project.status === 'active' ? 'bg-[#e4f3ef] text-[#27695f]' :
+                project.status === 'on-hold' ? 'bg-amber-50 text-amber-900' :
+                'bg-[#e9f4fa] text-[#245b7d]'
               }`}>
                 {getProjectStatusLabel(project.status, language)}
               </div>
-              <ChevronRight className="text-gray-300 transition-[color,transform] duration-200 group-hover:translate-x-0.5 group-hover:text-gray-900" />
+              <ChevronRight className="text-slate-300 transition-[color,transform] duration-200 group-hover:translate-x-0.5 group-hover:text-[#17324d]" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">{project.name}</h3>
-            <p className="text-gray-500 text-sm line-clamp-2 mb-6">{project.description}</p>
+            <h3 className="ui-text-main mb-2 text-xl font-bold">{project.name}</h3>
+            <p className="ui-text-subtle mb-6 line-clamp-2 text-sm">{project.description}</p>
             
-            <div className="flex items-center gap-4 text-xs text-gray-400 font-medium">
+            <div className="ui-kicker flex items-center gap-4 text-xs font-medium">
               <div className="flex items-center gap-1">
                 <CalendarDays size={14} />
                 {new Date(project.createdAt).toLocaleDateString(getLocale(language))}
@@ -2101,28 +2101,28 @@ const Dashboard = () => {
               role="dialog"
               aria-modal="true"
               aria-labelledby="new-project-dialog-title"
-              className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl"
+              className="ui-panel-card w-full max-w-md rounded-3xl p-8 shadow-2xl"
             >
               <h2 id="new-project-dialog-title" className="text-2xl font-bold mb-6">{t.createNewProject}</h2>
               <form onSubmit={handleAddProject} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t.projectName}</label>
+                  <label className="ui-text-main mb-1 block text-sm font-medium">{t.projectName}</label>
                   <input
                     ref={addProjectNameInputRef}
                     required
                     type="text"
                     value={newProject.name}
                     onChange={e => setNewProject({ ...newProject, name: e.target.value })}
-                    className="ui-focus-ring w-full rounded-xl border border-gray-200 px-4 py-3 transition-all focus:border-transparent focus:ring-2 focus:ring-gray-900 outline-none"
+                    className="ui-focus-ring ui-form-field w-full rounded-xl px-4 py-3 outline-none transition-all"
                     placeholder={t.websiteRedesign}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t.description}</label>
+                  <label className="ui-text-main mb-1 block text-sm font-medium">{t.description}</label>
                   <Textarea
                     value={newProject.description}
                     onChange={e => setNewProject({ ...newProject, description: e.target.value })}
-                    className="min-h-24 rounded-xl border-gray-200 px-4 py-3 resize-none focus-visible:border-transparent focus-visible:ring-2 focus-visible:ring-gray-900"
+                    className="ui-form-field min-h-24 resize-none rounded-xl px-4 py-3"
                     placeholder={t.projectGoals}
                   />
                 </div>
@@ -2140,13 +2140,13 @@ const Dashboard = () => {
                   <button
                     type="button"
                     onClick={() => setShowAddModal(false)}
-                    className="ui-focus-ring flex-1 rounded-xl px-6 py-3 font-medium text-gray-600 transition-colors hover:bg-gray-50"
+                    className="ui-focus-ring ui-action-secondary flex-1 rounded-xl px-6 py-3 font-medium transition-colors"
                   >
                     {t.cancel}
                   </button>
                   <button
                     type="submit"
-                    className="ui-focus-ring flex-1 rounded-xl bg-gray-900 px-6 py-3 font-medium text-white transition-colors hover:bg-gray-800"
+                    className="ui-focus-ring ui-action-primary flex-1 rounded-xl px-6 py-3 font-medium transition-colors"
                   >
                     {t.create}
                   </button>
@@ -3726,49 +3726,49 @@ const ProjectDetails = () => {
   };
 
   const renderReports = () => {
-    const colors = ['#94a3b8', '#fbbf24', '#60a5fa', '#10b981'];
+    const colors = ['#748bb5', '#d8a34f', '#2b6f8f', '#4b9b8a'];
 
     return (
       <div className="space-y-8">
         <dl className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-5">
-          <div className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm">
-            <dt className="mb-1 text-sm font-medium text-gray-500">{t.overallProgress}</dt>
+          <div className="ui-panel-card rounded-2xl p-6">
+            <dt className="ui-text-subtle mb-1 text-sm font-medium">{t.overallProgress}</dt>
             <dd className="flex items-end gap-2">
-              <span className="text-4xl font-bold text-gray-900">{overallProgress}%</span>
-              <span className="mb-1 text-sm text-gray-400">{t.complete}</span>
+              <span className="ui-text-main text-4xl font-bold">{overallProgress}%</span>
+              <span className="ui-kicker mb-1 text-sm">{t.complete}</span>
             </dd>
           </div>
-          <div className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm">
-            <dt className="mb-1 text-sm font-medium text-gray-500">{t.totalTasks}</dt>
+          <div className="ui-panel-card rounded-2xl p-6">
+            <dt className="ui-text-subtle mb-1 text-sm font-medium">{t.totalTasks}</dt>
             <dd className="flex items-end gap-2">
-              <span className="text-4xl font-bold text-gray-900">{totalTasks}</span>
-              <span className="mb-1 text-sm text-gray-400">{t.items}</span>
+              <span className="ui-text-main text-4xl font-bold">{totalTasks}</span>
+              <span className="ui-kicker mb-1 text-sm">{t.items}</span>
             </dd>
           </div>
-          <div className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm">
-            <dt className="mb-1 text-sm font-medium text-gray-500">{t.completed}</dt>
-            <dd className="flex items-end gap-2 text-emerald-600">
+          <div className="ui-panel-card rounded-2xl p-6">
+            <dt className="ui-text-subtle mb-1 text-sm font-medium">{t.completed}</dt>
+            <dd className="flex items-end gap-2 text-[#2f7d71]">
               <span className="text-4xl font-bold">{completedTasks}</span>
-              <span className="mb-1 text-sm text-emerald-400">{t.done}</span>
+              <span className="mb-1 text-sm text-[#62a597]">{t.done}</span>
             </dd>
           </div>
-          <div className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm">
-            <dt className="mb-1 text-sm font-medium text-gray-500">{labels.pendingApprovals}</dt>
+          <div className="ui-panel-card rounded-2xl p-6">
+            <dt className="ui-text-subtle mb-1 text-sm font-medium">{labels.pendingApprovals}</dt>
             <dd className="flex items-end gap-2">
-              <span className="text-4xl font-bold text-gray-900">{pendingApprovals.length}</span>
+              <span className="ui-text-main text-4xl font-bold">{pendingApprovals.length}</span>
             </dd>
           </div>
-          <div className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm">
-            <dt className="mb-1 text-sm font-medium text-gray-500">{labels.openRisks}</dt>
+          <div className="ui-panel-card rounded-2xl p-6">
+            <dt className="ui-text-subtle mb-1 text-sm font-medium">{labels.openRisks}</dt>
             <dd className="flex items-end gap-2">
-              <span className="text-4xl font-bold text-gray-900">{openRisks.length}</span>
+              <span className="ui-text-main text-4xl font-bold">{openRisks.length}</span>
             </dd>
           </div>
         </dl>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="rounded-2xl border border-slate-200/70 bg-white p-8 shadow-sm">
-            <h3 className="text-lg font-bold mb-6">{t.taskDistribution}</h3>
+          <div className="ui-panel-card rounded-2xl p-8">
+            <h3 className="ui-text-main mb-6 text-lg font-bold">{t.taskDistribution}</h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -3785,22 +3785,22 @@ const ProjectDetails = () => {
               {statusData.map((item, index) => (
                 <div key={item.name} className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: colors[index] }} />
-                  <span className="text-sm text-gray-600 font-medium">{item.name}</span>
+                  <span className="ui-text-subtle text-sm font-medium">{item.name}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="rounded-2xl border border-slate-200/70 bg-white p-8 shadow-sm">
-            <h3 className="text-lg font-bold mb-6">{labels.progressTrend}</h3>
+          <div className="ui-panel-card rounded-2xl p-8">
+            <h3 className="ui-text-main mb-6 text-lg font-bold">{labels.progressTrend}</h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={progressTrendData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eef2f7" />
-                  <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} />
-                  <YAxis axisLine={false} tickLine={false} domain={[0, 100]} tick={{ fill: '#94a3b8', fontSize: 12 }} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#dce6ef" />
+                  <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#7f93a6', fontSize: 12 }} />
+                  <YAxis axisLine={false} tickLine={false} domain={[0, 100]} tick={{ fill: '#7f93a6', fontSize: 12 }} />
                   <Tooltip />
-                  <Line type="monotone" dataKey="progress" stroke="#1e293b" strokeWidth={3} dot={{ r: 4 }} />
+                  <Line type="monotone" dataKey="progress" stroke="#17324d" strokeWidth={3} dot={{ r: 4, fill: '#17324d' }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -3808,19 +3808,19 @@ const ProjectDetails = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm">
-            <p className="text-gray-500 text-sm font-medium mb-1">{labels.projectHealth}</p>
+          <div className="ui-panel-card rounded-2xl p-6">
+            <p className="ui-text-subtle mb-1 text-sm font-medium">{labels.projectHealth}</p>
             <span className={`inline-flex items-center px-3 py-1 rounded-full border text-sm font-semibold mt-3 ${getHealthClasses(project?.health ?? 'green')}`}>
               {getHealthLabel(project?.health ?? 'green', language)}
             </span>
           </div>
-          <div className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm">
-            <p className="text-gray-500 text-sm font-medium mb-1">{labels.hoursConsumed}</p>
-            <p className="text-3xl font-bold text-gray-900">{hoursConsumed}%</p>
+          <div className="ui-panel-card rounded-2xl p-6">
+            <p className="ui-text-subtle mb-1 text-sm font-medium">{labels.hoursConsumed}</p>
+            <p className="ui-text-main text-3xl font-bold">{hoursConsumed}%</p>
           </div>
-          <div className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm">
-            <p className="text-gray-500 text-sm font-medium mb-1">{labels.budgetConsumed}</p>
-            <p className="text-3xl font-bold text-gray-900">{budgetConsumed}%</p>
+          <div className="ui-panel-card rounded-2xl p-6">
+            <p className="ui-text-subtle mb-1 text-sm font-medium">{labels.budgetConsumed}</p>
+            <p className="ui-text-main text-3xl font-bold">{budgetConsumed}%</p>
           </div>
         </div>
       </div>
@@ -4320,27 +4320,27 @@ const ProjectDetails = () => {
                     type="text"
                     value={newRisk.title}
                     onChange={e => setNewRisk(current => ({ ...current, title: e.target.value }))}
-                    className="h-12 rounded-xl border-gray-200 px-4"
+                    className="ui-form-field h-12 rounded-xl px-4"
                     placeholder={labels.riskPlaceholder}
                   />
                 </div>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-700">{labels.owner}</label>
+                    <label className="ui-text-main mb-2 block text-sm font-medium">{labels.owner}</label>
                     <Input
                       type="text"
                       value={newRisk.owner}
                       onChange={e => setNewRisk(current => ({ ...current, owner: e.target.value }))}
-                      className="h-12 rounded-xl border-gray-200 px-4"
+                      className="ui-form-field h-12 rounded-xl px-4"
                     />
                   </div>
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-700">{labels.category}</label>
+                    <label className="ui-text-main mb-2 block text-sm font-medium">{labels.category}</label>
                     <Select
                       value={newRisk.impact}
                       onValueChange={nextValue => setNewRisk(current => ({ ...current, impact: nextValue as RiskImpact }))}
                     >
-                      <SelectTrigger className="h-12 w-full rounded-xl border-gray-200 bg-white px-4 focus-visible:border-gray-900/20 focus-visible:ring-2 focus-visible:ring-gray-900/10">
+                      <SelectTrigger className="ui-form-field h-12 w-full rounded-xl px-4">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -4355,19 +4355,19 @@ const ProjectDetails = () => {
                 </div>
                 <Separator />
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-gray-700">{t.description}</label>
+                  <label className="ui-text-main mb-2 block text-sm font-medium">{t.description}</label>
                   <Textarea
                     value={newRisk.description}
                     onChange={e => setNewRisk(current => ({ ...current, description: e.target.value }))}
-                    className="min-h-28 resize-none rounded-xl border-gray-200 px-4 py-3 focus-visible:border-gray-900/20 focus-visible:ring-2 focus-visible:ring-gray-900/10"
+                    className="ui-form-field min-h-28 resize-none rounded-xl px-4 py-3"
                   />
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-gray-700">{labels.mitigate}</label>
+                  <label className="ui-text-main mb-2 block text-sm font-medium">{labels.mitigate}</label>
                   <Textarea
                     value={newRisk.mitigation}
                     onChange={e => setNewRisk(current => ({ ...current, mitigation: e.target.value }))}
-                    className="min-h-24 resize-none rounded-xl border-gray-200 px-4 py-3 focus-visible:border-gray-900/20 focus-visible:ring-2 focus-visible:ring-gray-900/10"
+                    className="ui-form-field min-h-24 resize-none rounded-xl px-4 py-3"
                   />
                 </div>
                 <div className="flex gap-3 pt-2">
@@ -4470,20 +4470,20 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#f5f8fb_0%,#edf3f8_100%)] p-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-12">
-          <div className="w-16 h-16 bg-gray-900 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-gray-200">
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#17324d] shadow-xl shadow-[#17324d]/15">
             <FolderOpen className="text-white w-8 h-8" />
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">PM Hub</h1>
-          <p className="text-gray-500">{t.pmHubTagline}</p>
+          <h1 className="ui-text-main mb-2 text-4xl font-bold">PM Hub</h1>
+          <p className="ui-text-subtle">{t.pmHubTagline}</p>
         </div>
 
-        <Card className="rounded-[28px] border border-gray-100 bg-white py-0 shadow-xl shadow-gray-100">
+        <Card className="ui-panel-card rounded-[28px] py-0 shadow-xl">
           <CardHeader className="px-8 pt-8 text-center">
-            <CardTitle className="text-xl font-bold text-gray-900">{t.welcomeBack}</CardTitle>
-            <CardDescription className="text-sm text-gray-500">{t.invitedLoginNote}</CardDescription>
+            <CardTitle className="ui-text-main text-xl font-bold">{t.welcomeBack}</CardTitle>
+            <CardDescription className="ui-text-subtle text-sm">{t.invitedLoginNote}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6 px-8 pb-8">
           {authError && (
@@ -4495,24 +4495,24 @@ const Login = () => {
             type="button"
             variant="outline"
             onClick={() => { void login(); }}
-            className="h-14 w-full justify-center gap-3 rounded-2xl border-gray-200 bg-white px-6 font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
+            className="ui-action-secondary h-14 w-full justify-center gap-3 rounded-2xl px-6 font-semibold shadow-sm"
           >
             <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
             {t.continueWithGoogle}
           </Button>
-          <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
-            <Separator className="flex-1 bg-gray-100" />
+          <div className="ui-kicker flex items-center gap-3 text-xs font-semibold uppercase tracking-wider">
+            <Separator className="flex-1 bg-slate-200/75" />
             <span>{t.continueWithEmail}</span>
-            <Separator className="flex-1 bg-gray-100" />
+            <Separator className="flex-1 bg-slate-200/75" />
           </div>
 
-          <div className="flex rounded-xl bg-gray-100 p-1">
+          <div className="flex rounded-xl bg-slate-100/90 p-1">
             <Button
               type="button"
               onClick={() => setLoginMethod('password')}
               variant="ghost"
               className={`h-10 flex-1 rounded-lg text-sm font-semibold shadow-none ${
-                loginMethod === 'password' ? 'bg-white text-gray-900 hover:bg-white' : 'text-gray-500 hover:bg-transparent hover:text-gray-800'
+                loginMethod === 'password' ? 'bg-white text-[#17324d] hover:bg-white' : 'ui-text-subtle hover:bg-transparent hover:text-[#17324d]'
               }`}
             >
               {t.emailPassword}
@@ -4522,7 +4522,7 @@ const Login = () => {
               onClick={() => setLoginMethod('magic')}
               variant="ghost"
               className={`h-10 flex-1 rounded-lg text-sm font-semibold shadow-none ${
-                loginMethod === 'magic' ? 'bg-white text-gray-900 hover:bg-white' : 'text-gray-500 hover:bg-transparent hover:text-gray-800'
+                loginMethod === 'magic' ? 'bg-white text-[#17324d] hover:bg-white' : 'ui-text-subtle hover:bg-transparent hover:text-[#17324d]'
               }`}
             >
               {t.magicLink}
@@ -4532,23 +4532,23 @@ const Login = () => {
           {loginMethod === 'password' ? (
             <form onSubmit={handlePasswordSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t.accessEmail}</label>
+                <label className="ui-text-main mb-1 block text-sm font-medium">{t.accessEmail}</label>
                 <Input
                   required
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  className="h-12 rounded-xl border-gray-200 px-4"
+                  className="ui-form-field h-12 rounded-xl px-4"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t.password}</label>
+                <label className="ui-text-main mb-1 block text-sm font-medium">{t.password}</label>
                 <Input
                   required
                   type="password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  className="h-12 rounded-xl border-gray-200 px-4"
+                  className="ui-form-field h-12 rounded-xl px-4"
                 />
               </div>
               <Button
@@ -4561,7 +4561,7 @@ const Login = () => {
                 type="button"
                 variant="ghost"
                 onClick={() => setPasswordMode(current => current === 'signin' ? 'signup' : 'signin')}
-                className="h-auto w-full justify-center px-0 py-1 text-sm text-gray-500 hover:bg-transparent hover:text-gray-900"
+                className="ui-text-subtle h-auto w-full justify-center px-0 py-1 text-sm hover:bg-transparent hover:text-[#17324d]"
               >
                 {passwordMode === 'signin'
                   ? `${t.noPasswordYet} ${t.createWithPassword}`
@@ -4573,13 +4573,13 @@ const Login = () => {
               {!isEmailLinkFlow && (
                 <form onSubmit={handleSendMagicLink} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.accessEmail}</label>
+                    <label className="ui-text-main mb-1 block text-sm font-medium">{t.accessEmail}</label>
                     <Input
                       required
                       type="email"
                       value={magicEmail}
                       onChange={e => setMagicEmail(e.target.value)}
-                      className="h-12 rounded-xl border-gray-200 px-4"
+                      className="ui-form-field h-12 rounded-xl px-4"
                     />
                   </div>
                   <Button
@@ -4758,41 +4758,41 @@ const ClientsList = () => {
     <div className="p-8 max-w-7xl mx-auto">
       <div className="flex justify-between items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t.clients}</h1>
-          <p className="text-sm text-gray-500 mt-1">{t.invitationNote}</p>
+          <h1 className="ui-text-main text-3xl font-bold">{t.clients}</h1>
+          <p className="ui-text-subtle mt-1 text-sm">{t.invitationNote}</p>
         </div>
         <button
           ref={inviteClientButtonRef}
           type="button"
           onClick={() => setShowInviteModal(true)}
-          className="ui-focus-ring ui-interactive-button flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-3 font-medium text-white transition-colors hover:bg-gray-800"
+          className="ui-focus-ring ui-interactive-button ui-action-primary flex items-center gap-2 rounded-xl px-5 py-3 font-medium transition-colors"
         >
           <Plus size={18} />
           {t.addClient}
         </button>
       </div>
 
-      <div className="mb-8 overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-sm">
-        <div className="px-6 py-5 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900">{t.activeClients}</h2>
+      <div className="ui-panel-card mb-8 overflow-hidden rounded-3xl">
+        <div className="border-b border-slate-200/80 px-6 py-5">
+          <h2 className="ui-text-main text-lg font-bold">{t.activeClients}</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[42rem] border-collapse text-left">
             <caption className="sr-only">{t.activeClients}</caption>
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-100">
-                <th scope="col" className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">{t.name}</th>
-                <th scope="col" className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">{t.email}</th>
-                <th scope="col" className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">{t.joined}</th>
-                <th scope="col" className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">{t.actions}</th>
+              <tr className="border-b border-slate-200/70 bg-slate-50/80">
+                <th scope="col" className="ui-kicker px-6 py-4 text-xs font-bold uppercase tracking-wider">{t.name}</th>
+                <th scope="col" className="ui-kicker px-6 py-4 text-xs font-bold uppercase tracking-wider">{t.email}</th>
+                <th scope="col" className="ui-kicker px-6 py-4 text-xs font-bold uppercase tracking-wider">{t.joined}</th>
+                <th scope="col" className="ui-kicker px-6 py-4 text-xs font-bold uppercase tracking-wider">{t.actions}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-slate-100">
               {clients.map(client => (
-                <tr key={client.uid} className="ui-interactive-row hover:bg-gray-50/50">
-                  <th scope="row" className="px-6 py-4 font-semibold text-gray-900">{client.displayName}</th>
-                  <td className="px-6 py-4 text-gray-500">{client.email}</td>
-                  <td className="px-6 py-4 text-gray-400 text-sm">{new Date(client.createdAt).toLocaleDateString(getLocale(language))}</td>
+                <tr key={client.uid} className="ui-interactive-row">
+                  <th scope="row" className="ui-text-main px-6 py-4 font-semibold">{client.displayName}</th>
+                  <td className="ui-text-subtle px-6 py-4">{client.email}</td>
+                  <td className="ui-kicker px-6 py-4 text-sm">{new Date(client.createdAt).toLocaleDateString(getLocale(language))}</td>
                   <td className="px-6 py-4 text-right">
                     <button
                       type="button"
@@ -4809,30 +4809,30 @@ const ClientsList = () => {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-sm">
-        <div className="px-6 py-5 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900">{t.invitedClients}</h2>
+      <div className="ui-panel-card overflow-hidden rounded-3xl">
+        <div className="border-b border-slate-200/80 px-6 py-5">
+          <h2 className="ui-text-main text-lg font-bold">{t.invitedClients}</h2>
         </div>
         {pendingInvitations.length === 0 ? (
-          <div className="px-6 py-8 text-sm text-gray-500">{t.noPendingInvites}</div>
+          <div className="ui-text-subtle px-6 py-8 text-sm">{t.noPendingInvites}</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[42rem] border-collapse text-left">
               <caption className="sr-only">{t.invitedClients}</caption>
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-100">
-                  <th scope="col" className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">{t.name}</th>
-                  <th scope="col" className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">{t.email}</th>
-                  <th scope="col" className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">{t.joined}</th>
-                  <th scope="col" className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">{t.actions}</th>
+                <tr className="border-b border-slate-200/70 bg-slate-50/80">
+                  <th scope="col" className="ui-kicker px-6 py-4 text-xs font-bold uppercase tracking-wider">{t.name}</th>
+                  <th scope="col" className="ui-kicker px-6 py-4 text-xs font-bold uppercase tracking-wider">{t.email}</th>
+                  <th scope="col" className="ui-kicker px-6 py-4 text-xs font-bold uppercase tracking-wider">{t.joined}</th>
+                  <th scope="col" className="ui-kicker px-6 py-4 text-xs font-bold uppercase tracking-wider">{t.actions}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-slate-100">
                 {pendingInvitations.map(invitation => (
-                  <tr key={invitation.id} className="ui-interactive-row hover:bg-gray-50/50">
-                    <th scope="row" className="px-6 py-4 font-semibold text-gray-900">{invitation.displayName || '-'}</th>
-                    <td className="px-6 py-4 text-gray-500">{invitation.email}</td>
-                    <td className="px-6 py-4 text-gray-400 text-sm">{new Date(invitation.invitedAt).toLocaleDateString(getLocale(language))}</td>
+                  <tr key={invitation.id} className="ui-interactive-row">
+                    <th scope="row" className="ui-text-main px-6 py-4 font-semibold">{invitation.displayName || '-'}</th>
+                    <td className="ui-text-subtle px-6 py-4">{invitation.email}</td>
+                    <td className="ui-kicker px-6 py-4 text-sm">{new Date(invitation.invitedAt).toLocaleDateString(getLocale(language))}</td>
                     <td className="px-6 py-4 text-right">
                       <button
                         type="button"
@@ -4867,43 +4867,43 @@ const ClientsList = () => {
               aria-modal="true"
               aria-labelledby="invite-client-dialog-title"
               aria-describedby="invite-client-dialog-description"
-              className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl"
+              className="ui-panel-card w-full max-w-md rounded-3xl p-8 shadow-2xl"
             >
               <h2 id="invite-client-dialog-title" className="text-2xl font-bold mb-2">{t.inviteClient}</h2>
-              <p id="invite-client-dialog-description" className="text-sm text-gray-500 mb-6">{t.invitationNote}</p>
+              <p id="invite-client-dialog-description" className="ui-text-subtle mb-6 text-sm">{t.invitationNote}</p>
               <form onSubmit={handleInviteClient} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t.clientName}</label>
+                  <label className="ui-text-main mb-1 block text-sm font-medium">{t.clientName}</label>
                   <input
                     ref={inviteNameInputRef}
                     type="text"
                     value={newInvitation.displayName}
                     onChange={e => setNewInvitation(current => ({ ...current, displayName: e.target.value }))}
-                    className="ui-focus-ring w-full rounded-xl border border-gray-200 px-4 py-3 transition-all focus:border-transparent focus:ring-2 focus:ring-gray-900 outline-none"
+                    className="ui-focus-ring ui-form-field w-full rounded-xl px-4 py-3 outline-none transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t.clientEmail}</label>
+                  <label className="ui-text-main mb-1 block text-sm font-medium">{t.clientEmail}</label>
                   <input
                     required
                     type="email"
                     value={newInvitation.email}
                     onChange={e => setNewInvitation(current => ({ ...current, email: e.target.value }))}
                     placeholder={t.emailPlaceholder}
-                    className="ui-focus-ring w-full rounded-xl border border-gray-200 px-4 py-3 transition-all focus:border-transparent focus:ring-2 focus:ring-gray-900 outline-none"
+                    className="ui-focus-ring ui-form-field w-full rounded-xl px-4 py-3 outline-none transition-all"
                   />
                 </div>
                 <div className="flex gap-3 pt-4">
                   <button
                     type="button"
                     onClick={() => setShowInviteModal(false)}
-                    className="ui-focus-ring flex-1 rounded-xl px-6 py-3 font-medium text-gray-600 transition-colors hover:bg-gray-50"
+                    className="ui-focus-ring ui-action-secondary flex-1 rounded-xl px-6 py-3 font-medium transition-colors"
                   >
                     {t.cancel}
                   </button>
                   <button
                     type="submit"
-                    className="ui-focus-ring flex-1 rounded-xl bg-gray-900 px-6 py-3 font-medium text-white transition-colors hover:bg-gray-800"
+                    className="ui-focus-ring ui-action-primary flex-1 rounded-xl px-6 py-3 font-medium transition-colors"
                   >
                     {t.invite}
                   </button>

@@ -23,32 +23,32 @@ export function ExecutiveSummaryCard({
 }: ExecutiveSummaryCardProps) {
   if (!title) {
     return (
-      <div className="rounded-2xl border border-dashed border-slate-200/80 bg-gray-50/80 px-6 py-7">
-        <p className="text-base font-semibold tracking-tight text-gray-900">{emptyTitle}</p>
-        <p className="mt-2 text-sm leading-6 text-gray-500">{emptyMessage}</p>
+      <div className="ui-panel-soft rounded-2xl border-dashed px-6 py-7">
+        <p className="ui-text-main text-base font-semibold tracking-tight">{emptyTitle}</p>
+        <p className="ui-text-subtle mt-2 text-sm leading-6">{emptyMessage}</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-slate-200/70 bg-gray-50/80 p-6">
+      <div className="ui-panel-tint rounded-2xl p-6">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-xl font-semibold tracking-tight text-gray-900">{title}</p>
-            <p className="mt-3 whitespace-pre-wrap text-[15px] leading-7 text-gray-500">{summary || '-'}</p>
+            <p className="ui-text-main text-xl font-semibold tracking-tight">{title}</p>
+            <p className="ui-text-subtle mt-3 whitespace-pre-wrap text-[15px] leading-7">{summary || '-'}</p>
           </div>
-          <p className="shrink-0 text-[11px] font-medium uppercase tracking-[0.14em] text-gray-400">{createdAtLabel}</p>
+          <p className="ui-kicker shrink-0 text-[11px] font-medium uppercase tracking-[0.14em]">{createdAtLabel}</p>
         </div>
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="rounded-2xl border border-slate-200/70 bg-white p-5">
-          <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.14em] text-gray-400">{nextActionLabel}</p>
-          <p className="whitespace-pre-wrap text-[15px] leading-7 text-gray-700">{nextActionValue || '-'}</p>
+        <div className="ui-panel-card rounded-2xl p-5">
+          <p className="ui-kicker mb-3 text-[11px] font-bold uppercase tracking-[0.14em]">{nextActionLabel}</p>
+          <p className="ui-text-main whitespace-pre-wrap text-[15px] leading-7">{nextActionValue || '-'}</p>
         </div>
-        <div className="rounded-2xl border border-slate-200/70 bg-white p-5">
-          <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.14em] text-gray-400">{blockersLabel}</p>
-          <p className="whitespace-pre-wrap text-[15px] leading-7 text-gray-700">{blockersValue || '-'}</p>
+        <div className="ui-panel-card rounded-2xl p-5">
+          <p className="ui-kicker mb-3 text-[11px] font-bold uppercase tracking-[0.14em]">{blockersLabel}</p>
+          <p className="ui-text-main whitespace-pre-wrap text-[15px] leading-7">{blockersValue || '-'}</p>
         </div>
       </div>
     </div>

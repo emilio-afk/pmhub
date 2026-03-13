@@ -39,22 +39,22 @@ export function RiskCard({
   editAction,
 }: RiskCardProps) {
   return (
-    <div className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm">
+    <div className="ui-panel-card rounded-2xl p-5">
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="flex flex-wrap items-center gap-3">
-            <h4 className="font-semibold text-gray-900">{risk.title}</h4>
+            <h4 className="ui-text-main font-semibold">{risk.title}</h4>
             <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${impactClassName}`}>
               {impactLabel}
             </span>
           </div>
-          <p className="mt-2 whitespace-pre-wrap text-sm text-gray-500">{risk.description || '-'}</p>
-          <p className="mt-2 text-sm text-gray-500">{ownerLabel}: {risk.owner || '-'}</p>
-          <p className="mt-2 whitespace-pre-wrap text-sm text-gray-500">{mitigateLabel}: {risk.mitigation || '-'}</p>
+          <p className="ui-text-subtle mt-2 whitespace-pre-wrap text-sm">{risk.description || '-'}</p>
+          <p className="ui-text-subtle mt-2 text-sm">{ownerLabel}: {risk.owner || '-'}</p>
+          <p className="ui-text-subtle mt-2 whitespace-pre-wrap text-sm">{mitigateLabel}: {risk.mitigation || '-'}</p>
         </div>
         <div className="flex items-start gap-3">
           {editAction}
-          <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+          <span className="ui-kicker text-xs font-semibold uppercase tracking-wider">
             {statusLabel}
           </span>
         </div>

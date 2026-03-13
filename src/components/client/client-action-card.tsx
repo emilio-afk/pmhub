@@ -36,12 +36,12 @@ export function ClientActionCard({
   editAction,
 }: ClientActionCardProps) {
   return (
-    <div className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm">
+    <div className="ui-panel-card rounded-2xl p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h4 className="text-[15px] font-semibold tracking-tight text-gray-900">{item.title}</h4>
-          <p className="mt-2 text-sm leading-6 text-gray-500">{item.description || '-'}</p>
-          <p className="mt-3 text-[11px] font-medium uppercase tracking-[0.14em] text-gray-400">{dueDateLabel}: {dueDateValue}</p>
+          <h4 className="ui-text-main text-[15px] font-semibold tracking-tight">{item.title}</h4>
+          <p className="ui-text-subtle mt-2 text-sm leading-6">{item.description || '-'}</p>
+          <p className="ui-kicker mt-3 text-[11px] font-medium uppercase tracking-[0.14em]">{dueDateLabel}: {dueDateValue}</p>
         </div>
         <div className="flex items-start gap-3">
           {editAction}
@@ -55,10 +55,10 @@ export function ClientActionCard({
         </div>
       </div>
       <div className="mt-5 flex flex-wrap gap-2">
-        <Button type="button" variant="outline" onClick={onMarkSubmitted} className="rounded-xl border-sky-200 text-sm font-medium text-sky-700 hover:bg-sky-50 hover:text-sky-800">
+        <Button type="button" variant="outline" onClick={onMarkSubmitted} className="rounded-xl border-[#b7d5e5] text-sm font-medium text-[#2b6f8f] hover:bg-[#e9f4fa] hover:text-[#245b7d]">
           {markSubmittedLabel}
         </Button>
-        <Button type="button" variant="outline" onClick={onMarkDone} className="rounded-xl border-emerald-200 text-sm font-medium text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800">
+        <Button type="button" variant="outline" onClick={onMarkDone} className="rounded-xl border-[#b9ddd3] text-sm font-medium text-[#2f7d71] hover:bg-[#e4f3ef] hover:text-[#27695f]">
           {markDoneLabel}
         </Button>
       </div>

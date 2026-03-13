@@ -77,7 +77,7 @@ export function UpdateForm({
 
   return (
     <form onSubmit={handleSubmit}>
-      <FieldGroup className="grid grid-cols-1 gap-4 rounded-3xl border border-gray-100 bg-gray-50/70 p-5 lg:grid-cols-2">
+      <FieldGroup className="ui-form-shell grid grid-cols-1 gap-4 rounded-3xl p-5 lg:grid-cols-2">
         <Field data-invalid={touched.title && titleError ? true : undefined}>
           <FieldLabel htmlFor="update-title">{titleLabel}</FieldLabel>
           <Input
@@ -89,7 +89,7 @@ export function UpdateForm({
             onBlur={() => handleBlur('title')}
             aria-invalid={touched.title && titleError ? true : undefined}
             placeholder={titlePlaceholder}
-            className="h-12 rounded-2xl bg-white px-4"
+            className="ui-form-field h-12 rounded-2xl px-4"
           />
           <FieldError>{touched.title ? titleError : ''}</FieldError>
         </Field>
@@ -104,7 +104,7 @@ export function UpdateForm({
             onChange={e => onChange('progress', e.target.value)}
             onBlur={() => handleBlur('progress')}
             aria-invalid={touched.progress && progressError ? true : undefined}
-            className="h-12 rounded-2xl bg-white px-4"
+            className="ui-form-field h-12 rounded-2xl px-4"
           />
           <FieldError>{touched.progress ? progressError : ''}</FieldError>
         </Field>
@@ -116,7 +116,7 @@ export function UpdateForm({
             value={value.summary}
             onChange={e => onChange('summary', e.target.value)}
             onBlur={() => handleBlur('summary')}
-            className="resize-none rounded-2xl bg-white px-4 py-3"
+            className="ui-form-field resize-none rounded-2xl px-4 py-3"
           />
         </Field>
         <Field>
@@ -127,7 +127,7 @@ export function UpdateForm({
             value={value.achievements}
             onChange={e => onChange('achievements', e.target.value)}
             onBlur={() => handleBlur('achievements')}
-            className="resize-none rounded-2xl bg-white px-4 py-3"
+            className="ui-form-field resize-none rounded-2xl px-4 py-3"
           />
         </Field>
         <Field>
@@ -138,7 +138,7 @@ export function UpdateForm({
             value={value.blockers}
             onChange={e => onChange('blockers', e.target.value)}
             onBlur={() => handleBlur('blockers')}
-            className="resize-none rounded-2xl bg-white px-4 py-3"
+            className="ui-form-field resize-none rounded-2xl px-4 py-3"
           />
         </Field>
         <Field className="lg:col-span-2">
@@ -149,11 +149,11 @@ export function UpdateForm({
             value={value.nextSteps}
             onChange={e => onChange('nextSteps', e.target.value)}
             onBlur={() => handleBlur('nextSteps')}
-            className="resize-none rounded-2xl bg-white px-4 py-3"
+            className="ui-form-field resize-none rounded-2xl px-4 py-3"
           />
         </Field>
         <div className="flex justify-end gap-3 lg:col-span-2">
-          <Button type="button" variant="ghost" onClick={onCancel} className="rounded-xl px-5 py-3 font-semibold text-gray-600 hover:bg-white">
+          <Button type="button" variant="ghost" onClick={onCancel} className="ui-action-secondary rounded-xl px-5 py-3 font-semibold">
             {cancelLabel}
           </Button>
           <Button type="submit" className="rounded-xl px-5 py-3 font-semibold">

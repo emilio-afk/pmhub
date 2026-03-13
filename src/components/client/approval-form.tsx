@@ -77,7 +77,7 @@ export function ApprovalForm({
 
   return (
     <form onSubmit={handleSubmit}>
-      <FieldGroup className="grid grid-cols-1 gap-4 rounded-3xl border border-gray-100 bg-gray-50/70 p-5 lg:grid-cols-[1fr,220px]">
+      <FieldGroup className="ui-form-shell grid grid-cols-1 gap-4 rounded-3xl p-5 lg:grid-cols-[1fr,220px]">
         <Field data-invalid={touched.title && titleError ? true : undefined}>
           <FieldLabel htmlFor="approval-title">{titleLabel}</FieldLabel>
           <Input
@@ -89,7 +89,7 @@ export function ApprovalForm({
             onBlur={() => handleBlur('title')}
             aria-invalid={touched.title && titleError ? true : undefined}
             placeholder={titlePlaceholder}
-            className="h-12 rounded-2xl bg-white px-4"
+            className="ui-form-field h-12 rounded-2xl px-4"
           />
           <FieldError>{touched.title ? titleError : ''}</FieldError>
         </Field>
@@ -104,7 +104,7 @@ export function ApprovalForm({
           >
             <SelectTrigger
               id="approval-item-type"
-              className="h-12 w-full rounded-2xl bg-white px-4"
+              className="ui-form-field h-12 w-full rounded-2xl px-4"
               aria-invalid={touched.itemType && itemTypeError ? true : undefined}
             >
               <SelectValue />
@@ -129,11 +129,11 @@ export function ApprovalForm({
             value={value.description}
             onChange={e => onChange('description', e.target.value)}
             onBlur={() => handleBlur('description')}
-            className="resize-none rounded-2xl bg-white px-4 py-3"
+            className="ui-form-field resize-none rounded-2xl px-4 py-3"
           />
         </Field>
         <div className="flex justify-end gap-3 lg:col-span-2">
-          <Button type="button" variant="ghost" onClick={onCancel} className="rounded-xl px-5 py-3 font-semibold text-gray-600 hover:bg-white">
+          <Button type="button" variant="ghost" onClick={onCancel} className="ui-action-secondary rounded-xl px-5 py-3 font-semibold">
             {cancelLabel}
           </Button>
           <Button type="submit" className="rounded-xl px-5 py-3 font-semibold">

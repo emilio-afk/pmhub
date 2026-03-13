@@ -123,7 +123,7 @@ export function InternalControlsForm({
           <Field>
             <FieldLabel htmlFor="project-health">{projectHealthLabel}</FieldLabel>
             <Select disabled={!canManage} value={value.health} onValueChange={onHealthChange}>
-              <SelectTrigger id="project-health" className="h-12 w-full rounded-2xl bg-white px-4 disabled:bg-gray-50">
+              <SelectTrigger id="project-health" className="ui-form-field h-12 w-full rounded-2xl px-4 disabled:bg-slate-100">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -146,7 +146,7 @@ export function InternalControlsForm({
               onChange={e => onChange('budgetHours', e.target.value)}
               onBlur={() => handleBlur('budgetHours')}
               aria-invalid={touched.budgetHours && getNumericError('budgetHours') ? true : undefined}
-              className="h-12 rounded-2xl bg-white px-4 disabled:bg-gray-50"
+              className="ui-form-field h-12 rounded-2xl px-4 disabled:bg-slate-100"
             />
             <FieldError>{touched.budgetHours ? getNumericError('budgetHours') : ''}</FieldError>
           </Field>
@@ -161,7 +161,7 @@ export function InternalControlsForm({
               onChange={e => onChange('usedHours', e.target.value)}
               onBlur={() => handleBlur('usedHours')}
               aria-invalid={touched.usedHours && getNumericError('usedHours') ? true : undefined}
-              className="h-12 rounded-2xl bg-white px-4 disabled:bg-gray-50"
+              className="ui-form-field h-12 rounded-2xl px-4 disabled:bg-slate-100"
             />
             <FieldError>{touched.usedHours ? getNumericError('usedHours') : ''}</FieldError>
           </Field>
@@ -176,7 +176,7 @@ export function InternalControlsForm({
               onChange={e => onChange('budgetAmount', e.target.value)}
               onBlur={() => handleBlur('budgetAmount')}
               aria-invalid={touched.budgetAmount && getNumericError('budgetAmount') ? true : undefined}
-              className="h-12 rounded-2xl bg-white px-4 disabled:bg-gray-50"
+              className="ui-form-field h-12 rounded-2xl px-4 disabled:bg-slate-100"
             />
             <FieldError>{touched.budgetAmount ? getNumericError('budgetAmount') : ''}</FieldError>
           </Field>
@@ -191,7 +191,7 @@ export function InternalControlsForm({
               onChange={e => onChange('spentAmount', e.target.value)}
               onBlur={() => handleBlur('spentAmount')}
               aria-invalid={touched.spentAmount && getNumericError('spentAmount') ? true : undefined}
-              className="h-12 rounded-2xl bg-white px-4 disabled:bg-gray-50"
+              className="ui-form-field h-12 rounded-2xl px-4 disabled:bg-slate-100"
             />
             <FieldError>{touched.spentAmount ? getNumericError('spentAmount') : ''}</FieldError>
           </Field>
@@ -206,7 +206,7 @@ export function InternalControlsForm({
             onChange={e => onChange('scopeSummary', e.target.value)}
             onBlur={() => handleBlur('scopeSummary')}
             placeholder={scopePlaceholder}
-            className="resize-none rounded-2xl bg-white px-4 py-3 disabled:bg-gray-50"
+            className="ui-form-field resize-none rounded-2xl px-4 py-3 disabled:bg-slate-100"
           />
         </Field>
         {canManage && (
@@ -218,22 +218,22 @@ export function InternalControlsForm({
         )}
       </div>
       <div className="space-y-4">
-        <div className="rounded-2xl border border-gray-100 bg-gray-50 p-5">
-          <p className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-400">{hoursConsumedLabel}</p>
-          <p className="text-3xl font-bold text-gray-900">{hoursConsumedValue}</p>
-          <Progress value={hoursConsumedProgress} className="mt-4 h-2 rounded-full bg-gray-200 [&_[data-slot=progress-indicator]]:bg-gray-900" />
-          <p className="mt-2 text-sm text-gray-500">{hoursConsumedPercent}</p>
+        <div className="ui-panel-soft rounded-2xl p-5">
+          <p className="ui-kicker mb-2 text-xs font-bold uppercase tracking-wider">{hoursConsumedLabel}</p>
+          <p className="ui-text-main text-3xl font-bold">{hoursConsumedValue}</p>
+          <Progress value={hoursConsumedProgress} className="mt-4 h-2 rounded-full bg-slate-200/70 [&_[data-slot=progress-indicator]]:bg-[#2b6f8f]" />
+          <p className="ui-text-subtle mt-2 text-sm">{hoursConsumedPercent}</p>
         </div>
-        <div className="rounded-2xl border border-gray-100 bg-gray-50 p-5">
-          <p className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-400">{budgetConsumedLabel}</p>
-          <p className="text-3xl font-bold text-gray-900">{budgetConsumedValue}</p>
-          <Progress value={budgetConsumedProgress} className="mt-4 h-2 rounded-full bg-gray-200 [&_[data-slot=progress-indicator]]:bg-gray-900" />
-          <p className="mt-2 text-sm text-gray-500">{budgetConsumedPercent}</p>
+        <div className="ui-panel-soft rounded-2xl p-5">
+          <p className="ui-kicker mb-2 text-xs font-bold uppercase tracking-wider">{budgetConsumedLabel}</p>
+          <p className="ui-text-main text-3xl font-bold">{budgetConsumedValue}</p>
+          <Progress value={budgetConsumedProgress} className="mt-4 h-2 rounded-full bg-slate-200/70 [&_[data-slot=progress-indicator]]:bg-[#d8a34f]" />
+          <p className="ui-text-subtle mt-2 text-sm">{budgetConsumedPercent}</p>
         </div>
-        <div className="rounded-2xl border border-gray-100 bg-gray-50 p-5">
-          <p className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-400">{scopeChangesLabel}</p>
-          <p className="text-3xl font-bold text-gray-900">{scopeChangesValue}</p>
-          <p className="mt-2 whitespace-pre-wrap text-sm text-gray-500">{scopeSummaryValue}</p>
+        <div className="ui-panel-soft rounded-2xl p-5">
+          <p className="ui-kicker mb-2 text-xs font-bold uppercase tracking-wider">{scopeChangesLabel}</p>
+          <p className="ui-text-main text-3xl font-bold">{scopeChangesValue}</p>
+          <p className="ui-text-subtle mt-2 whitespace-pre-wrap text-sm">{scopeSummaryValue}</p>
         </div>
       </div>
     </form>

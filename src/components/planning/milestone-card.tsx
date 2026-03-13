@@ -66,7 +66,7 @@ export function MilestoneCard({
   comments,
 }: MilestoneCardProps) {
   return (
-    <div className="rounded-3xl border border-slate-200/70 bg-white p-7 shadow-sm">
+    <div className="ui-panel-card rounded-3xl p-7">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <button
           type="button"
@@ -77,7 +77,7 @@ export function MilestoneCard({
         >
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-3">
-              <h4 className="text-xl font-semibold tracking-tight text-gray-900">{milestone.title}</h4>
+              <h4 className="ui-text-main text-xl font-semibold tracking-tight">{milestone.title}</h4>
               <Badge
                 variant="outline"
                 className={`px-3 py-1 text-xs font-semibold ${statusClassName}`}
@@ -87,20 +87,20 @@ export function MilestoneCard({
               </Badge>
               <Badge
                 variant="outline"
-                className="border-gray-200 bg-gray-50 px-3 py-1 text-xs font-semibold text-gray-600"
+                className="border-slate-200 bg-slate-50/90 px-3 py-1 text-xs font-semibold text-slate-700"
                 aria-label={`Progress: ${milestone.progress}%`}
               >
                 {milestone.progress}%
               </Badge>
             </div>
-            <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
+            <div className="ui-text-subtle mt-2.5 flex flex-wrap gap-x-4 gap-y-1 text-sm">
               <p>{dueDateLabel}: {dueDateValue}</p>
               <p>{ownerLabel}: {milestone.owner || '-'}</p>
             </div>
           </div>
           <ChevronDown
             size={18}
-            className={`mt-1 shrink-0 text-gray-400 transition-[color,transform] duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+            className={`ui-kicker mt-1 shrink-0 transition-[color,transform] duration-200 ${isExpanded ? 'rotate-180' : ''}`}
           />
         </button>
         {canManage && (
@@ -122,17 +122,17 @@ export function MilestoneCard({
 
       {isExpanded && (
         <>
-          <p className="mt-5 whitespace-pre-wrap text-[15px] leading-7 text-gray-500">{milestone.description || '-'}</p>
+          <p className="ui-text-subtle mt-5 whitespace-pre-wrap text-[15px] leading-7">{milestone.description || '-'}</p>
           <Progress
             value={milestone.progress}
             aria-label={`${milestone.title} progress: ${milestone.progress}%`}
-            className="mt-6 h-2 rounded-full bg-gray-100 [&_[data-slot=progress-indicator]]:bg-gray-900"
+            className="mt-6 h-2 rounded-full bg-slate-200/65 [&_[data-slot=progress-indicator]]:bg-[#2b6f8f]"
           />
           <div className="mt-4 flex items-center justify-between gap-4">
-            <p className="text-sm text-gray-500">{milestone.progress}%</p>
+            <p className="ui-text-subtle text-sm">{milestone.progress}%</p>
             {canManage && (
               <div className="flex flex-wrap gap-2">
-                <Button type="button" variant="outline" onClick={onMarkPlanned} className="ui-interactive-button rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">
+                <Button type="button" variant="outline" onClick={onMarkPlanned} className="ui-action-secondary ui-interactive-button rounded-xl text-sm font-medium">
                   {markPlannedLabel}
                 </Button>
                 <Button type="button" variant="outline" onClick={onMarkAtRisk} className="ui-interactive-button rounded-xl border-amber-200 text-sm font-medium text-amber-700 hover:bg-amber-50 hover:text-amber-800">

@@ -36,42 +36,42 @@ export function UpdateCard({
   editAction,
 }: UpdateCardProps) {
   return (
-    <div className="rounded-3xl border border-slate-200/70 bg-white p-7 shadow-sm">
+    <div className="ui-panel-card rounded-3xl p-7">
       <div className="flex flex-col justify-between gap-5 md:flex-row md:items-start">
         <div>
-          <h4 className="text-xl font-semibold tracking-tight text-gray-900">{entry.title}</h4>
-          <p className="mt-1.5 text-sm text-gray-500">{createdByLabel}: {entry.authorName}</p>
+          <h4 className="ui-text-main text-xl font-semibold tracking-tight">{entry.title}</h4>
+          <p className="ui-text-subtle mt-1.5 text-sm">{createdByLabel}: {entry.authorName}</p>
         </div>
         <div className="flex items-start gap-3">
           {editAction}
           <div className="text-right">
-            <p className="text-sm font-semibold text-gray-900">{entry.progress}%</p>
-            <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.14em] text-gray-400">{createdAtLabel}</p>
+            <p className="ui-text-main text-sm font-semibold">{entry.progress}%</p>
+            <p className="ui-kicker mt-1 text-[11px] font-medium uppercase tracking-[0.14em]">{createdAtLabel}</p>
           </div>
         </div>
       </div>
-      <div className="mt-4 h-2 overflow-hidden rounded-full bg-gray-100">
+      <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200/65">
         <Progress
           value={entry.progress}
-          className="h-2 rounded-full bg-gray-100 [&_[data-slot=progress-indicator]]:bg-emerald-500"
+          className="h-2 rounded-full bg-slate-200/65 [&_[data-slot=progress-indicator]]:bg-[#4b9b8a]"
         />
       </div>
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl border border-slate-200/70 bg-gray-50 p-5">
-          <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.14em] text-gray-400">{summaryLabel}</p>
-          <p className="whitespace-pre-wrap text-[15px] leading-7 text-gray-600">{entry.summary || '-'}</p>
+        <div className="ui-panel-soft rounded-2xl p-5">
+          <p className="ui-kicker mb-3 text-[11px] font-bold uppercase tracking-[0.14em]">{summaryLabel}</p>
+          <p className="ui-text-subtle whitespace-pre-wrap text-[15px] leading-7">{entry.summary || '-'}</p>
         </div>
-        <div className="rounded-2xl border border-slate-200/70 bg-gray-50 p-5">
-          <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.14em] text-gray-400">{achievementsLabel}</p>
-          <p className="whitespace-pre-wrap text-[15px] leading-7 text-gray-600">{entry.achievements || '-'}</p>
+        <div className="ui-panel-soft rounded-2xl p-5">
+          <p className="ui-kicker mb-3 text-[11px] font-bold uppercase tracking-[0.14em]">{achievementsLabel}</p>
+          <p className="ui-text-subtle whitespace-pre-wrap text-[15px] leading-7">{entry.achievements || '-'}</p>
         </div>
-        <div className="rounded-2xl border border-slate-200/70 bg-gray-50 p-5">
-          <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.14em] text-gray-400">{blockersLabel}</p>
-          <p className="whitespace-pre-wrap text-[15px] leading-7 text-gray-600">{entry.blockers || '-'}</p>
+        <div className="ui-panel-soft rounded-2xl p-5">
+          <p className="ui-kicker mb-3 text-[11px] font-bold uppercase tracking-[0.14em]">{blockersLabel}</p>
+          <p className="ui-text-subtle whitespace-pre-wrap text-[15px] leading-7">{entry.blockers || '-'}</p>
         </div>
-        <div className="rounded-2xl border border-slate-200/70 bg-gray-50 p-5">
-          <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.14em] text-gray-400">{nextStepsLabel}</p>
-          <p className="whitespace-pre-wrap text-[15px] leading-7 text-gray-600">{entry.nextSteps || '-'}</p>
+        <div className="ui-panel-soft rounded-2xl p-5">
+          <p className="ui-kicker mb-3 text-[11px] font-bold uppercase tracking-[0.14em]">{nextStepsLabel}</p>
+          <p className="ui-text-subtle whitespace-pre-wrap text-[15px] leading-7">{entry.nextSteps || '-'}</p>
         </div>
       </div>
     </div>

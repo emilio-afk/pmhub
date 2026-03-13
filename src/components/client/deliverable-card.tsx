@@ -42,11 +42,11 @@ export function DeliverableCard({
   comments,
 }: DeliverableCardProps) {
   return (
-    <div className="rounded-3xl border border-slate-200/70 bg-white p-7 shadow-sm">
+    <div className="ui-panel-card rounded-3xl p-7">
       <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
         <div>
           <div className="flex flex-wrap items-center gap-3">
-            <h4 className="text-xl font-semibold tracking-tight text-gray-900">{deliverable.title}</h4>
+            <h4 className="ui-text-main text-xl font-semibold tracking-tight">{deliverable.title}</h4>
             <Badge
               variant="outline"
               className={`px-3 py-1 text-xs font-semibold ${statusClassName}`}
@@ -56,14 +56,14 @@ export function DeliverableCard({
             </Badge>
             <Badge
               variant="outline"
-              className="border-gray-200 bg-gray-50 px-3 py-1 text-xs font-semibold text-gray-600"
+              className="border-slate-200 bg-slate-50/90 px-3 py-1 text-xs font-semibold text-slate-700"
               aria-label={`Version: ${deliverable.version}`}
             >
               {deliverable.version}
             </Badge>
           </div>
-          <p className="mt-2 text-sm text-gray-500">{deliverable.category || '-'}</p>
-          <p className="mt-4 whitespace-pre-wrap text-[15px] leading-7 text-gray-600">{deliverable.notes || '-'}</p>
+          <p className="ui-text-subtle mt-2 text-sm">{deliverable.category || '-'}</p>
+          <p className="ui-text-subtle mt-4 whitespace-pre-wrap text-[15px] leading-7">{deliverable.notes || '-'}</p>
         </div>
         <div className="flex items-start gap-3">
           {editAction}
@@ -71,7 +71,7 @@ export function DeliverableCard({
             href={deliverable.url}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-gray-900 hover:text-gray-700"
+            className="ui-text-main inline-flex items-center gap-2 text-sm font-semibold transition-colors hover:text-[#2b6f8f]"
           >
             <Link2 size={16} />
             {resourceLinkLabel}
@@ -80,10 +80,10 @@ export function DeliverableCard({
       </div>
       {canManage && (
         <div className="mt-5 flex flex-wrap gap-2">
-          <Button type="button" variant="outline" onClick={onMarkShared} className="rounded-xl border-sky-200 text-sm font-medium text-sky-700 hover:bg-sky-50 hover:text-sky-800">
+          <Button type="button" variant="outline" onClick={onMarkShared} className="rounded-xl border-[#b7d5e5] text-sm font-medium text-[#2b6f8f] hover:bg-[#e9f4fa] hover:text-[#245b7d]">
             {markSharedLabel}
           </Button>
-          <Button type="button" variant="outline" onClick={onMarkApproved} className="rounded-xl border-emerald-200 text-sm font-medium text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800">
+          <Button type="button" variant="outline" onClick={onMarkApproved} className="rounded-xl border-[#b9ddd3] text-sm font-medium text-[#2f7d71] hover:bg-[#e4f3ef] hover:text-[#27695f]">
             {markApprovedLabel}
           </Button>
         </div>
