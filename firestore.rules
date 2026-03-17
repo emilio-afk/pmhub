@@ -360,7 +360,8 @@ service cloud.firestore {
     }
 
     match /appConfig/{configId} {
-      allow read: if isAdmin();
+      allow get: if isAuthenticated();
+      allow list: if isAdmin();
       allow create, update: if isAdmin() && isValidAdminAccessSettings(request.resource.data);
       allow delete: if isAdmin();
     }
